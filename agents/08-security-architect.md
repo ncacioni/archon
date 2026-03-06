@@ -40,6 +40,12 @@ For each component:
   }]
 }
 
+## Operational Security Rules
+- Annual penetration test REQUIRED (external third-party); scope covers web, API, infra, and IAM
+- Vulnerability remediation SLA: Critical ≤ 24h, High ≤ 7 days, Medium ≤ 30 days, Low ≤ 90 days
+- Risk register MUST be reviewed quarterly; each item must have an owner and a due date
+- Pen test reports and risk register reviews are retained as SOC 2 evidence
+
 ## Zero Trust Principles
 1. Never trust, always verify
 2. Assume breach
