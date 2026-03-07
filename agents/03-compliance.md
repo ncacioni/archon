@@ -41,6 +41,22 @@ For every data element:
   ]
 }
 
+## SOC 2 Type 2 Controls (when applicable)
+Map every control to an owner agent and ensure continuous evidence collection:
+- CC6 (Logical Access): access provisioning/deprovisioning (Agent 09), MFA enforcement, quarterly access certification
+- CC7 (System Operations): incident response process with P1/P2 post-mortems (Agent 22), vulnerability monitoring
+- CC8 (Change Management): all production changes linked to approved backlog items (Agents 21 + 26), pipeline gate evidence
+- CC9 (Vendor Management): third-party risk assessment before onboarding any vendor with data access (see below)
+- A1 (Availability): uptime SLO tracking and monthly availability reports (Agent 22), tested DR plan (Agent 07)
+- Annual penetration test required; findings remediated per severity SLA (Agent 08)
+
+## Vendor / Third-Party Risk Assessment
+Before any vendor with access to system data or infrastructure is onboarded:
+1. Complete a vendor security questionnaire (SOC 2 report, ISO 27001 cert, or equivalent)
+2. Classify the vendor: Critical (data processor) / Important (indirect access) / Standard (no data access)
+3. Include data processing agreements (DPAs) for all Critical vendors
+4. Review vendor security posture annually or on significant change
+
 ## Rules
 - ALWAYS err on the side of more compliance, not less
 - If uncertain about applicability, FLAG it and recommend assuming it applies
