@@ -1,17 +1,57 @@
-# Quick Start Guide — Multi-Agent Framework for Vibe Coding
+# Quick Start Guide — USDAF
 
-## How to Use This Framework
+## Option A: Using the v2.0 Runtime (Recommended)
 
-### Option A: Full Orchestration (Recommended for complex projects)
+```bash
+# 1. Initialize USDAF in your project
+cd your-project
+npx usdaf init
 
-1. Open a new chat with your AI assistant
-2. Paste the **Orchestrator Agent prompt** (from `prompts/00-orchestrator.md`)
-3. Describe what you want to build
-4. The Orchestrator will guide you through all phases
+# 2. This creates:
+#    .usdaf/runtime/    — 6 runtime modules
+#    .usdaf/skills/     — 6 phase skill definitions
+#    .usdaf/toolkits/   — Agent tool indices + definitions
+#    .usdaf/config.yml  — Project configuration
+#    Updates CLAUDE.md and .gitignore
 
-### Option B: Individual Agents (For specific tasks)
+# 3. Estimate token cost before starting
+node .usdaf/runtime/token-estimator.js estimate --complexity medium
 
-Pick the agent you need and paste its system prompt from the master document:
+# 4. Start with Agent 00 (Orchestrator) — it will guide the rest
+```
+
+### v2.0 Runtime Commands
+
+```bash
+# Token estimation
+node .usdaf/runtime/token-estimator.js estimate --complexity simple
+node .usdaf/runtime/token-estimator.js estimate --complexity complex --agents 00,02,04,08,12,15,17
+
+# Agent memory
+node .usdaf/runtime/memory-manager.js load 08-security-architect
+node .usdaf/runtime/memory-manager.js compact 08-security-architect
+
+# Toolkit inspection
+node .usdaf/runtime/toolkit-loader.js list 08-security-architect
+node .usdaf/runtime/toolkit-loader.js load stride-analysis
+
+# Scout cache
+node .usdaf/runtime/scout-service.js search jwt --cache-only
+node .usdaf/runtime/scout-service.js cache
+
+# Maintenance
+node .usdaf/runtime/maintenance.js audit
+node .usdaf/runtime/maintenance.js check
+```
+
+## Option B: Manual Agent Loading (Any LLM)
+
+1. Pick a team preset from `docs/team-presets.md`
+2. Load the relevant agent prompts from `agents/`
+3. Append the certification context from `docs/agent-certification-map.md`
+4. Start with Phase 0 (Kickoff)
+
+### Agent Quick Reference
 
 | I need to... | Use Agent |
 |---|---|
@@ -22,48 +62,38 @@ Pick the agent you need and paste its system prompt from the master document:
 | Write business logic | 12-Domain Logic Agent |
 | Build the frontend | 15-Frontend Architect + 16-UI Builder |
 | Write tests | 17-Test Architect + 18-Test Implementation |
-| Review code for security | 20-SAST Agent |
+| Review code for security | 08-Security Architect + 20-SAST Agent |
 | Set up CI/CD | 21-CI/CD Agent |
 
-### Option C: Security Review Only
+## Option C: Security Review Only
 
 For existing code, use agents 08 + 11 + 19 + 20 in sequence:
-1. Security Architect → threat model your system
-2. Threat Intelligence → find attack surfaces
-3. Code Review → check architecture compliance
-4. SAST → scan for OWASP Top 10
+1. Security Architect — threat model your system
+2. Threat Intelligence — find attack surfaces
+3. Code Review — check architecture compliance
+4. SAST — scan for OWASP Top 10
 
 ## Tips for Best Results
 
-1. **Start with requirements** — Even for vibe coding, spending 5 minutes on requirements saves hours of rework
-2. **Always include the IAM agent** — Auth is where most projects get hacked
-3. **Use the Security Architect early** — It's cheaper to design security in than bolt it on
+1. **Start with requirements** — Even for fast projects, 5 minutes on requirements saves hours of rework
+2. **Always include the Security agent** — Auth is where most projects get compromised
+3. **Use the Security Architect early** — Designing security in is cheaper than bolting it on
 4. **Feed artifacts forward** — Each agent's output is the next agent's input
 5. **Don't skip gates** — If a gate fails, fix it before moving on
+6. **Check memory** — Agent learnings from past sessions prevent repeating mistakes
 
 ## Example Prompt to Start
 
 ```
-[Paste Orchestrator system prompt]
-
-Build me a task management API with:
+I want to build a task management API with:
 - User registration and login
-- Teams that can have multiple users
+- Teams with multiple users
 - Tasks assigned to users within teams
 - Role-based access (admin, member, viewer)
-- REST API
-- PostgreSQL database
-- Deploy with Docker
+- REST API with PostgreSQL
+- Docker deployment
+
+Use USDAF phases 0-7 and start with Phase 0 (Kickoff).
 ```
 
-The Orchestrator will then invoke each agent in order, building the complete system.
-
-## File Structure
-
-```
-framework/
-├── QUICKSTART.md                    ← You are here
-├── multi-agent-framework.md         ← Complete framework with all 24 prompts
-└── prompts/
-    └── 00-orchestrator.md           ← Main entry point prompt
-```
+The Orchestrator will invoke each agent in order, building the complete system.
