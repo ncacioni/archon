@@ -1,0 +1,55 @@
+id: erd-generator
+description: "Generate Entity-Relationship Diagram from domain model"
+when_to_use: "During data architecture design (Phase 1) when defining the domain model"
+input:
+  - name: domain_name
+    type: string
+    required: true
+    description: "Name of the bounded context or domain being modeled"
+  - name: entities
+    type: array
+    required: true
+    description: "List of entity names in the domain"
+template: |
+  ## ERD: {{domain_name}}
+
+  ### Mermaid Diagram
+  ```mermaid
+  erDiagram
+  {{#each entities}}
+      {{this}} {
+          uuid id PK
+          timestamp created_at
+          timestamp updated_at
+      }
+  {{/each}}
+
+  %% Define relationships below
+  %% ENTITY_A ||--o{ ENTITY_B : "has many"
+  %% ENTITY_A }o--|| ENTITY_C : "belongs to"
+  ```
+
+  ### Entity Definitions
+
+  {{#each entities}}
+  #### {{this}}
+  | Column | Type | Constraints | Description |
+  |--------|------|-------------|-------------|
+  | id | UUID | PK, NOT NULL | Primary key |
+  | created_at | TIMESTAMP | NOT NULL, DEFAULT NOW() | Creation timestamp |
+  | updated_at | TIMESTAMP | NOT NULL, DEFAULT NOW() | Last update timestamp |
+  | [add domain fields] | | | |
+
+  **Indexes:**
+  - PRIMARY KEY (id)
+  - [additional indexes]
+
+  **Business Rules:**
+  - [invariants and constraints]
+  {{/each}}
+
+  ### Relationship Summary
+  | From | Relationship | To | FK Column |
+  |------|-------------|-----|-----------|
+  | | | | |
+output: "erd.mermaid + schema-definitions.md artifacts"

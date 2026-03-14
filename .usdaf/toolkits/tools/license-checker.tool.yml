@@ -1,0 +1,56 @@
+id: license-checker
+description: "Verify package license compatibility with project requirements"
+when_to_use: "Before approving any new dependency — mandatory check in agent 25 scouting workflow"
+input:
+  - name: package_name
+    type: string
+    required: true
+    description: "Package to check"
+  - name: project_license
+    type: string
+    required: false
+    description: "License of the consuming project (default: MIT)"
+template: |
+  ## License Check: {{package_name}}
+  **Project License:** {{project_license}}
+
+  ### License Compatibility Matrix
+
+  | License | Commercial Use | Modification | Distribution | Patent Grant | Copyleft | Compatible with MIT |
+  |---------|---------------|--------------|--------------|-------------|----------|---------------------|
+  | MIT | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+  | Apache 2.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+  | BSD 2/3-Clause | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+  | ISC | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+  | MPL 2.0 | ✅ | ✅ | ✅ | ✅ | File-level | ⚠️ Review |
+  | LGPL 2.1/3 | ✅ | ✅ | ✅ | ✅ | Library | ⚠️ Review |
+  | GPL 2/3 | ✅ | ✅ | ✅ | ✅ | Strong | ❌ |
+  | AGPL 3 | ✅ | ✅ | ✅ | ✅ | Network | ❌ |
+  | UNLICENSED | ❌ | ❌ | ❌ | ❌ | — | ❌ Block |
+
+  ### Package License Finding
+  | Field | Value |
+  |-------|-------|
+  | Package | {{package_name}} |
+  | License | [check npm page or repo] |
+  | SPDX identifier | [e.g. MIT, Apache-2.0] |
+  | License file present | Yes / No |
+  | Consistent across versions | Yes / No |
+
+  ### Automated Check
+  ```bash
+  # Check single package
+  npx license-checker --packages {{package_name}} --json
+
+  # Check all project deps
+  npx license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;Unlicense" --excludePrivatePackages
+  ```
+
+  ### Decision
+  - [ ] APPROVED — license compatible with project
+  - [ ] APPROVED with legal review — review sent to legal team
+  - [ ] REJECTED — license incompatible: [reason]
+  - [ ] BLOCKED — no license / UNLICENSED — do not use
+
+  **Note:** If the package is AGPL/GPL and we are distributing software, consult Legal before proceeding.
+output: "license-check-[package].md with compliance decision"

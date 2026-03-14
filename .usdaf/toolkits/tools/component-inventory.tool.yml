@@ -1,0 +1,68 @@
+id: component-inventory
+description: "Inventory of UI components with props, variants, and dependencies"
+when_to_use: "When auditing existing UI components or planning a new design system (agent 15)"
+input:
+  - name: component_name
+    type: string
+    required: true
+    description: "Name of the component to document"
+  - name: component_path
+    type: string
+    required: false
+    description: "File path to the component source"
+template: |
+  ## Component Inventory: {{component_name}}
+  **Path:** {{component_path}}
+
+  ### Component Metadata
+  | Field | Value |
+  |-------|-------|
+  | Name | {{component_name}} |
+  | Category | [atom / molecule / organism / template / page] |
+  | Design System | [shadcn/ui / custom / Magic UI] |
+  | Status | [stable / experimental / deprecated] |
+  | Accessibility | [WCAG 2.1 AA / partial / none] |
+
+  ### Props Interface
+  ```typescript
+  interface {{component_name}}Props {
+    // Required props
+    [propName]: [type]; // [description]
+
+    // Optional props
+    [propName]?: [type]; // [description] (default: [value])
+
+    // Event handlers
+    onChange?: (value: [type]) => void;
+    onError?: (error: Error) => void;
+
+    // Styling
+    className?: string;
+    style?: React.CSSProperties;
+  }
+  ```
+
+  ### Variants
+  | Variant | Description | Use Case |
+  |---------|-------------|----------|
+  | default | Base appearance | General use |
+  | [variant] | [description] | [when to use] |
+
+  ### Dependencies
+  - Internal: [list of child components]
+  - External: [npm packages used]
+  - Context: [React contexts consumed]
+
+  ### Usage Example
+  ```tsx
+  import { {{component_name}} } from '@/components/[path]';
+
+  <{{component_name}}
+    [requiredProp]={value}
+    [optionalProp]={value}
+  />
+  ```
+
+  ### Known Issues / TODOs
+  - [Any known limitations or planned improvements]
+output: "component-inventory.md artifact for design system documentation"

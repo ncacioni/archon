@@ -1,0 +1,48 @@
+id: schema-validator
+description: "Validate database schema against naming conventions and normalization"
+when_to_use: "During data architecture review before any schema is approved for implementation"
+input:
+  - name: schema_name
+    type: string
+    required: true
+    description: "Name of the schema or table being validated"
+  - name: ddl_snippet
+    type: string
+    required: false
+    description: "DDL SQL to validate — paste CREATE TABLE statement"
+template: |
+  ## Schema Validation: {{schema_name}}
+
+  ### Naming Conventions Checklist
+  - [ ] Table names: plural, snake_case (e.g. `user_accounts`, not `UserAccount`)
+  - [ ] Column names: snake_case (e.g. `created_at`, not `createdAt`)
+  - [ ] Primary keys: `id` (UUID preferred) or `[table_singular]_id`
+  - [ ] Foreign keys: `[referenced_table_singular]_id`
+  - [ ] Indexes: `idx_[table]_[column(s)]`
+  - [ ] Constraints: `[table]_[column]_[type]` (e.g. `users_email_unique`)
+  - [ ] Boolean columns: prefixed with `is_` or `has_`
+  - [ ] Timestamp columns: `_at` suffix (e.g. `deleted_at`)
+
+  ### Normalization Review
+  - [ ] 1NF: All columns atomic, no repeating groups
+  - [ ] 2NF: No partial dependencies on composite PKs
+  - [ ] 3NF: No transitive dependencies
+  - [ ] BCNF exceptions documented with rationale
+
+  ### Type Safety
+  - [ ] UUIDs for primary/foreign keys (not integers where possible)
+  - [ ] TIMESTAMP WITH TIME ZONE (not naive TIMESTAMP)
+  - [ ] VARCHAR with appropriate length limits
+  - [ ] DECIMAL/NUMERIC for monetary values (not FLOAT)
+  - [ ] ENUM types documented and migration-safe
+
+  ### Issues Found
+  | Column/Constraint | Issue | Severity | Fix |
+  |-------------------|-------|----------|-----|
+  | | | | |
+
+  ### Decision
+  - [ ] APPROVED — schema meets standards
+  - [ ] APPROVED WITH NOTES — minor issues logged
+  - [ ] REJECTED — issues must be resolved before implementation
+output: "schema-validation-report.md with pass/fail per convention"

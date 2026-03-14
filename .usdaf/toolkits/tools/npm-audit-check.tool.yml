@@ -1,0 +1,39 @@
+id: npm-audit-check
+description: "Run npm audit and parse results into risk matrix"
+when_to_use: "During security gate review before any release or dependency update"
+input:
+  - name: project_path
+    type: string
+    required: true
+    description: "Path to the project root containing package.json"
+  - name: severity_threshold
+    type: string
+    required: false
+    description: "Minimum severity to flag: low, moderate, high, critical (default: moderate)"
+template: |
+  ## npm Audit Report: {{project_path}}
+
+  ### Risk Matrix
+
+  | Package | Severity | CVSS | Vulnerability | Fix Available |
+  |---------|----------|------|---------------|---------------|
+  | (run npm audit --json) | | | | |
+
+  ### Summary
+  - Critical: [count]
+  - High: [count]
+  - Moderate: [count]
+  - Low: [count]
+
+  ### Action Items
+  - [ ] Immediate: Patch all Critical/High within 24h
+  - [ ] Planned: Address Moderate within sprint
+  - [ ] Tracked: Log Low in backlog
+
+  ### Commands
+  ```bash
+  npm audit --json > audit-report.json
+  npm audit fix          # auto-fix compatible updates
+  npm audit fix --force  # force breaking updates (review carefully)
+  ```
+output: "audit-risk-matrix.md artifact with prioritized remediation list"

@@ -1,0 +1,56 @@
+id: coverage-matrix
+description: "Test coverage matrix mapping requirements to test cases"
+when_to_use: "During test strategy review (agent 17) to ensure all requirements have test coverage"
+input:
+  - name: feature_name
+    type: string
+    required: true
+    description: "Feature or module being mapped"
+  - name: requirements
+    type: array
+    required: false
+    description: "List of requirement IDs to map against"
+template: |
+  ## Test Coverage Matrix: {{feature_name}}
+
+  ### Requirements → Test Mapping
+
+  | Req ID | Requirement | Unit Test | Integration Test | E2E Test | Coverage |
+  |--------|-------------|-----------|-----------------|----------|----------|
+  | FR-001 | [requirement] | [test file:line] | [test file:line] | [scenario] | ✅ Full |
+  | FR-002 | [requirement] | [test file:line] | — | [scenario] | ⚠️ Partial |
+  | NFR-001 | [requirement] | — | [test file:line] | — | ✅ Full |
+  | | | | | | |
+
+  ### Coverage Summary
+  | Test Type | Total Tests | Passing | Coverage % |
+  |-----------|-------------|---------|------------|
+  | Unit | | | |
+  | Integration | | | |
+  | E2E | | | |
+  | Security | | | |
+  | **Total** | | | |
+
+  ### Code Coverage Report
+  ```
+  # Run to generate:
+  npm run test:coverage
+
+  # Key metrics:
+  Statements : [x]%
+  Branches   : [x]%
+  Functions  : [x]%
+  Lines      : [x]%
+  ```
+
+  ### Uncovered Areas
+  | Area | Reason | Risk | Action |
+  |------|--------|------|--------|
+  | | | | |
+
+  ### Coverage Gates
+  - [ ] Statement coverage ≥ 80%
+  - [ ] Branch coverage ≥ 75%
+  - [ ] All critical paths covered (auth, payments, data writes)
+  - [ ] All error/exception paths have at least one test
+output: "coverage-matrix-[feature].md + coverage-report link"

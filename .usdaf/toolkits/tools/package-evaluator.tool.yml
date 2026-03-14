@@ -1,0 +1,78 @@
+id: package-evaluator
+description: "Evaluate package health: downloads, maintenance, security, license"
+when_to_use: "Final evaluation gate before recommending a package for adoption (agent 25 final step)"
+input:
+  - name: package_name
+    type: string
+    required: true
+    description: "npm package to evaluate"
+  - name: package_version
+    type: string
+    required: false
+    description: "Version to evaluate (default: latest)"
+template: |
+  ## Package Evaluation: {{package_name}}@{{package_version}}
+
+  ### 1. Popularity & Adoption
+  | Metric | Value | Signal |
+  |--------|-------|--------|
+  | Weekly downloads | [from npmjs] | >10k = healthy |
+  | GitHub stars | | >100 = established |
+  | Dependent packages | [from npmjs] | High = battle-tested |
+  | Used by (notable) | | |
+
+  ### 2. Maintenance Health
+  | Metric | Value | Signal |
+  |--------|-------|--------|
+  | Last published | | <6mo = active |
+  | Release frequency | | Regular = healthy |
+  | Open issues | | Ratio matters |
+  | Open PRs | | Being merged? |
+  | Core contributors | | Bus factor |
+  | CHANGELOG present | Yes / No | |
+
+  ### 3. Code Quality
+  | Metric | Value |
+  |--------|-------|
+  | TypeScript support | Native / @types / None |
+  | ESM support | Yes / CJS only |
+  | Test coverage | [if reported] |
+  | CI/CD | Yes / No |
+  | Bundle size (gzip) | [from bundlephobia] |
+  | Tree-shakeable | Yes / No |
+  | Peer dependencies | [list] |
+
+  ### 4. Security
+  | Check | Result |
+  |-------|--------|
+  | npm audit result | 0 vulns / [count] |
+  | CVE history | Clean / [notable CVEs] |
+  | Security policy (SECURITY.md) | Yes / No |
+  | Provenance / supply chain | Signed / Unsigned |
+
+  ### 5. License
+  | Field | Value |
+  |-------|-------|
+  | License | [SPDX] |
+  | Compatibility | Compatible / Review needed |
+
+  ### Score Summary
+  | Dimension | Score (1-5) | Notes |
+  |-----------|-------------|-------|
+  | Popularity | | |
+  | Maintenance | | |
+  | Code Quality | | |
+  | Security | | |
+  | License | | |
+  | **Total** | **/25** | |
+
+  ### Recommendation
+  - Score 20-25: ADOPT — recommend for production use
+  - Score 15-19: TRIAL — use with monitoring
+  - Score 10-14: ASSESS — investigate further
+  - Score <10: HOLD — do not adopt
+
+  **Final verdict:** [ADOPT / TRIAL / ASSESS / HOLD]
+  **Reason:** [summary rationale]
+  **Alternatives if rejected:** [list alternatives or native approach]
+output: "package-evaluation-[package].md with scored recommendation"

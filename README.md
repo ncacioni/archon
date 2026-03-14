@@ -2,7 +2,7 @@
 
 A multi-agent development framework that enforces **spec-first development**, **security-by-design**, and **professional-grade architecture** across any software project.
 
-34 specialized AI agents. 8 development phases. Security veto power built in.
+34 specialized AI agents. 8 development phases. Security veto power built in. **Intelligent runtime included.**
 
 ## What is USDAF?
 
@@ -13,6 +13,36 @@ USDAF is a framework for orchestrating AI agents (Claude, GPT, or any LLM) throu
 - **Professional certifications** — Each agent operates with the knowledge of a real-world professional certification (CISSP, TOGAF, OSCP, etc.)
 - **Clean Architecture** — Dependencies always point inward. Domain logic never depends on infrastructure.
 - **Gate reviews** — Each phase has explicit entry/exit criteria before proceeding
+
+## v2.0 Runtime — "Idea to MVP"
+
+USDAF v2.0 adds an intelligent runtime that makes the framework dramatically more efficient:
+
+| Module | What it does |
+|--------|-------------|
+| **Agent Memory** | Persistent learnings across sessions. Errors, decisions, and discoveries graduate from session to long-term memory. Automatic compaction. |
+| **Two-Level Toolkits** | Lightweight index (~200 tokens) always loaded, full tool definitions (~500 tokens) loaded on-demand. 24 tools across 7 roles. |
+| **OSS Scout** | Evaluation cache for packages — star ratings, license filtering, vulnerability tracking. No re-evaluating across projects. |
+| **Token Estimator** | Cost estimation before starting: agents x phases x complexity, with cache discounts. |
+| **Subagent Dispatch** | Only 3 agents in main context (00, 08, 24). Everything else as subagents. ~75% token reduction. |
+| **Maintenance Agent** | Audits toolkit integrity, flags stale/vulnerable packages on configurable schedule. |
+| **Phase Skills** | 6 phase definitions (discovery → operations) with agent assignments, gate criteria, and token budgets. |
+
+### Quick Start (v2.0)
+
+```bash
+# Initialize in any project
+npx usdaf init
+
+# Estimate token cost
+node .usdaf/runtime/token-estimator.js estimate --complexity medium
+
+# Check agent memory
+node .usdaf/runtime/memory-manager.js load 08-security-architect
+
+# Run maintenance audit
+node .usdaf/runtime/maintenance.js audit
+```
 
 ## Architecture
 
@@ -68,8 +98,6 @@ Phase 7: Maintenance      → Monitoring, incident response, improvements
 
 ## Team Presets
 
-Not every project needs all 34 agents. USDAF includes team presets for common project types:
-
 | Preset | Agents | Use Case |
 |--------|--------|----------|
 | **Full Stack** | 00-33 | Complete application with frontend + backend |
@@ -82,23 +110,31 @@ Not every project needs all 34 agents. USDAF includes team presets for common pr
 
 See [docs/team-presets.md](docs/team-presets.md) for full details.
 
+## Repository Structure
+
+```
+agents/              34 agent system prompts (NN-agent-name.md)
+docs/                Framework documentation and guides
+bin/                 CLI entry point (npx usdaf init)
+.usdaf/              v2.0 Runtime (created by npx usdaf init)
+├── runtime/         6 modules + 50 tests
+├── skills/          6 phase skill definitions
+├── toolkits/        7 agent indices + 24 tool definitions
+├── memory/          Persistent agent memory (auto-managed)
+└── config.yml       Project configuration
+```
+
 ## Quick Start
 
-1. **Copy the agent prompts** from `agents/` into your LLM's system prompt
-2. **Start with Agent 00** (Orchestrator) — it will guide the rest
-3. **Follow the phases** — don't skip to implementation
+### Using with Claude Code (Recommended)
 
-For a step-by-step walkthrough, see [QUICKSTART.md](QUICKSTART.md).
+```bash
+# Initialize the runtime in your project
+cd your-project
+npx usdaf init
 
-### Using with Claude
-
-Add to your `CLAUDE.md`:
-
-```markdown
-## Development Framework
-Follow USDAF phases 0-7 for all development work.
-Read docs/USDAF.md for the full framework.
-For each active agent, consult docs/agent-certification-map.md.
+# The init command creates .usdaf/, updates CLAUDE.md, and sets up .gitignore
+# Then start with Agent 00 (Orchestrator)
 ```
 
 ### Using with any LLM
@@ -108,6 +144,8 @@ For each active agent, consult docs/agent-certification-map.md.
 3. Append the certification context from `docs/agent-certification-map.md`
 4. Start with Phase 0 (Kickoff)
 
+For a step-by-step walkthrough, see [QUICKSTART.md](QUICKSTART.md).
+
 ## Key Principles
 
 - **No code before specs** — OpenAPI, DB schema, and wireframes must be approved first
@@ -115,7 +153,7 @@ For each active agent, consult docs/agent-certification-map.md.
 - **Dependencies point inward** — Clean Architecture: Domain < Application < Infrastructure < UI
 - **Every agent has a certification** — Professional-grade knowledge, not generic advice
 - **Gate reviews between phases** — Explicit entry/exit criteria prevent shortcuts
-- **Markdown-native backlog** — No external tools needed, everything lives in `backlog/` files
+- **Memory persists** — Agent learnings carry forward across sessions (v2.0)
 
 ## Documentation
 
@@ -123,12 +161,10 @@ For each active agent, consult docs/agent-certification-map.md.
 |----------|-------------|
 | [USDAF.md](docs/USDAF.md) | Master framework document |
 | [MASTER-INVOCATION-GUIDE.md](docs/MASTER-INVOCATION-GUIDE.md) | How to invoke the framework |
-| [multi-agent-framework.md](docs/multi-agent-framework.md) | Full agent definitions |
 | [agent-certification-map.md](docs/agent-certification-map.md) | Professional certifications per agent |
 | [team-presets.md](docs/team-presets.md) | Team configurations by project type |
 | [spec-templates.md](docs/spec-templates.md) | OpenAPI, DB schema, wireframe templates |
 | [backlog-guide.md](docs/backlog-guide.md) | Markdown-native backlog management |
-| [transformation-plan.md](docs/transformation-plan.md) | Migrating existing projects to USDAF |
 | [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
 
 ## License

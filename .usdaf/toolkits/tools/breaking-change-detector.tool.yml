@@ -1,0 +1,57 @@
+id: breaking-change-detector
+description: "Detect breaking changes between API versions"
+when_to_use: "Before releasing any API change — mandatory during integration architecture review"
+input:
+  - name: old_version
+    type: string
+    required: true
+    description: "Previous API version (e.g. v1.2.0 or path to old spec file)"
+  - name: new_version
+    type: string
+    required: true
+    description: "New API version (e.g. v1.3.0 or path to new spec file)"
+template: |
+  ## Breaking Change Analysis: {{old_version}} → {{new_version}}
+
+  ### Breaking Change Categories
+
+  #### BREAKING — Requires major version bump or deprecation period
+  - [ ] Endpoint removed
+  - [ ] HTTP method changed on existing endpoint
+  - [ ] Required request parameter removed
+  - [ ] New required request parameter added (without default)
+  - [ ] Response schema field removed
+  - [ ] Response field type changed incompatibly
+  - [ ] Auth scheme changed
+  - [ ] Error code changed for existing condition
+
+  #### NON-BREAKING — Safe to ship in minor version
+  - [ ] New optional endpoint added
+  - [ ] New optional request parameter added
+  - [ ] New response field added
+  - [ ] Deprecation notice added (field/endpoint still works)
+
+  ### Change Inventory
+
+  | Path | Type | Old Behavior | New Behavior | Breaking? |
+  |------|------|-------------|--------------|-----------|
+  | | | | | |
+
+  ### Affected Consumers
+  | Consumer | Impact | Migration Required | Owner |
+  |----------|--------|-------------------|-------|
+  | | | | |
+
+  ### Migration Guide
+  ```
+  # For consumers upgrading from {{old_version}} to {{new_version}}:
+
+  1. [Change 1]: [what to update in consumer code]
+  2. [Change 2]: [what to update in consumer code]
+  ```
+
+  ### Decision
+  - [ ] NO BREAKING CHANGES — safe to release as minor/patch
+  - [ ] BREAKING CHANGES — requires deprecation window: [duration]
+  - [ ] BREAKING CHANGES — requires major version bump to v[X]
+output: "breaking-change-report.md with migration guide for consumers"

@@ -1,0 +1,45 @@
+id: requirement-classifier
+description: "Classify requirements as functional, non-functional, or constraint"
+when_to_use: "During requirements triage to ensure proper routing to the right agents and backlog columns"
+input:
+  - name: requirement_text
+    type: string
+    required: true
+    description: "The raw requirement statement to classify"
+template: |
+  ## Requirement Classification
+
+  **Input:** {{requirement_text}}
+
+  ### Classification Decision Tree
+
+  1. Does it describe WHAT the system must DO (behavior / feature)?
+     → Functional Requirement (FR)
+
+  2. Does it describe HOW WELL the system must perform (quality attribute)?
+     → Non-Functional Requirement (NFR) — subcategory:
+     - Performance (response time, throughput)
+     - Security (auth, encryption, audit)
+     - Reliability (uptime, MTTR)
+     - Scalability (load, concurrent users)
+     - Maintainability (code quality, documentation)
+     - Usability (UX, accessibility)
+
+  3. Does it describe an EXTERNAL RESTRICTION (law, standard, platform limit)?
+     → Constraint (CON)
+
+  ### Output
+
+  | Field | Value |
+  |-------|-------|
+  | Type | FR / NFR / CON |
+  | Subcategory | [see above] |
+  | Priority | Must / Should / Could / Won't |
+  | Owner Agent | [e.g. 12-domain-logic, 08-security-architect] |
+  | Testable? | Yes / No — [reason if No] |
+  | Source | [stakeholder / document] |
+
+  ### Notes
+  - [Any ambiguities requiring clarification]
+  - [Related requirements]
+output: "classified-requirement.md with routing recommendation"

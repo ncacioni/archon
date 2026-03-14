@@ -1,0 +1,67 @@
+id: test-strategy-template
+description: "Test strategy template with scope, tools, and risk assessment"
+when_to_use: "At the start of any new feature or project to define the testing approach (agent 17, Phase 0/1)"
+input:
+  - name: project_name
+    type: string
+    required: true
+    description: "Name of the project or feature being tested"
+  - name: tech_stack
+    type: string
+    required: false
+    description: "Technology stack (e.g. Node.js + React + PostgreSQL)"
+template: |
+  ## Test Strategy: {{project_name}}
+  **Stack:** {{tech_stack}}
+  **Version:** 1.0 | **Date:** [date]
+
+  ### 1. Scope
+  **In scope:**
+  - [List of features/components to be tested]
+
+  **Out of scope:**
+  - [Explicitly excluded areas and rationale]
+
+  ### 2. Test Pyramid
+
+  | Level | Tool | Coverage Target | When to Run |
+  |-------|------|----------------|-------------|
+  | Unit | [Vitest / Jest / node:test] | ≥ 80% statements | Pre-commit, CI |
+  | Integration | [Supertest / testcontainers] | Critical paths | CI on PR |
+  | E2E | [Playwright / Cypress] | Happy paths + key errors | CI nightly / pre-release |
+  | Performance | [k6 / autocannon] | Baseline established | Pre-release |
+  | Security | [OWASP ZAP / npm audit] | All endpoints | CI weekly |
+
+  ### 3. Test Environments
+  | Environment | Purpose | Data | Access |
+  |-------------|---------|------|--------|
+  | Local dev | Unit + integration | Fixtures / Docker | Developer |
+  | CI (GitHub Actions) | All automated tests | Reset per run | CI pipeline |
+  | Staging | E2E + manual | Anonymized prod clone | QA team |
+
+  ### 4. Risk Assessment
+  | Risk | Probability | Impact | Mitigation |
+  |------|------------|--------|------------|
+  | Auth bypass | Low | Critical | Dedicated auth test suite |
+  | Data loss on write | Low | High | Transaction + rollback tests |
+  | Performance regression | Medium | High | Baseline benchmarks in CI |
+  | [other risk] | | | |
+
+  ### 5. Definition of Done (Testing)
+  - [ ] Unit tests for all new functions/classes
+  - [ ] Integration tests for all new API endpoints
+  - [ ] E2E tests for all new user-facing flows
+  - [ ] No regression in existing test suite
+  - [ ] Coverage thresholds met
+  - [ ] Security scan passing
+
+  ### 6. Tools & Configuration
+  ```json
+  {
+    "testRunner": "[vitest|jest|node:test]",
+    "coverageReporter": "[v8|istanbul]",
+    "e2eFramework": "[playwright|cypress]",
+    "ciIntegration": "[github-actions|gitlab-ci]"
+  }
+  ```
+output: "test-strategy-[project].md — reviewed and signed off by agent 17"

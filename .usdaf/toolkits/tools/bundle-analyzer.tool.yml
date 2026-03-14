@@ -1,0 +1,61 @@
+id: bundle-analyzer
+description: "Analyze bundle size impact of new dependencies"
+when_to_use: "Before adding any new npm dependency to a frontend project (agent 15 gate)"
+input:
+  - name: package_name
+    type: string
+    required: true
+    description: "npm package being evaluated for addition"
+  - name: package_version
+    type: string
+    required: false
+    description: "Version to evaluate (default: latest)"
+template: |
+  ## Bundle Impact Analysis: {{package_name}}@{{package_version}}
+
+  ### Size Analysis
+  | Metric | Value |
+  |--------|-------|
+  | Minified size | [check bundlephobia.com] |
+  | Gzipped size | [check bundlephobia.com] |
+  | Tree-shakeable? | Yes / No |
+  | Side effects? | Yes / No |
+  | Current total bundle | [run `npm run build -- --report`] |
+  | New total bundle | [estimated after addition] |
+  | Size increase % | [calculated] |
+
+  ### Bundlephobia Report
+  - URL: https://bundlephobia.com/package/{{package_name}}@{{package_version}}
+  - Download time (3G): [from bundlephobia]
+  - Download time (4G): [from bundlephobia]
+
+  ### Alternatives Considered
+  | Package | Gzipped Size | Tree-shakeable | Notes |
+  |---------|-------------|----------------|-------|
+  | {{package_name}} | | | Primary candidate |
+  | [alternative 1] | | | |
+  | [alternative 2] | | | |
+  | Native implementation | N/A | N/A | Consider if simple enough |
+
+  ### Tree-Shaking Verification
+  ```javascript
+  // Import only what you need (preferred):
+  import { specificFunction } from '{{package_name}}';
+
+  // Avoid full package import:
+  // import * as lib from '{{package_name}}'; // ❌
+  ```
+
+  ### Performance Budget Check
+  | Budget Metric | Limit | After Addition | Pass? |
+  |--------------|-------|----------------|-------|
+  | Initial bundle | < 200KB gzip | | |
+  | Largest chunk | < 100KB gzip | | |
+  | First contentful paint | < 1.5s | | |
+
+  ### Decision
+  - [ ] APPROVED — within budget, no better alternative
+  - [ ] APPROVED with tree-shaking requirement: [specific imports only]
+  - [ ] REJECTED — use [alternative] instead
+  - [ ] REJECTED — implement natively ([estimated effort])
+output: "bundle-analysis-[package].md with size delta and recommendation"

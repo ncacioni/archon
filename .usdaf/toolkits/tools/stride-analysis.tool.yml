@@ -1,0 +1,27 @@
+id: stride-analysis
+description: "STRIDE threat model template"
+when_to_use: "During security review of new components or APIs"
+input:
+  - name: component_name
+    type: string
+    required: true
+  - name: data_flows
+    type: array
+    description: "List of data flows to analyze"
+template: |
+  ## STRIDE Analysis: {{component_name}}
+
+  | Threat | Applies? | Mitigation | Status |
+  |--------|----------|------------|--------|
+  | Spoofing | | | |
+  | Tampering | | | |
+  | Repudiation | | | |
+  | Info Disclosure | | | |
+  | Denial of Service | | | |
+  | Elevation of Priv. | | | |
+
+  ### Data Flows
+  {{#each data_flows}}
+  - {{this}}: [threat analysis]
+  {{/each}}
+output: "threat-model.md artifact"

@@ -1,0 +1,53 @@
+id: acceptance-criteria-generator
+description: "Generate BDD-style acceptance criteria from requirements"
+when_to_use: "When converting raw requirements into testable acceptance criteria (Gherkin/BDD format)"
+input:
+  - name: requirement
+    type: string
+    required: true
+    description: "The requirement statement to convert into acceptance criteria"
+  - name: context
+    type: string
+    required: false
+    description: "Additional domain context or system constraints"
+template: |
+  ## Acceptance Criteria: {{requirement}}
+
+  ### Happy Path
+  ```gherkin
+  Feature: [feature name]
+
+  Scenario: [main success scenario]
+    Given [initial state / preconditions]
+    When [actor performs action]
+    Then [observable outcome]
+    And [additional assertion]
+  ```
+
+  ### Edge Cases
+  ```gherkin
+  Scenario: [edge case 1]
+    Given [boundary condition]
+    When [action]
+    Then [expected behavior at boundary]
+
+  Scenario: [edge case 2]
+    Given [another boundary]
+    When [action]
+    Then [expected behavior]
+  ```
+
+  ### Error / Failure Scenarios
+  ```gherkin
+  Scenario: [failure scenario]
+    Given [invalid state or input]
+    When [actor attempts action]
+    Then [error is surfaced gracefully]
+    And [system state is unchanged / rolled back]
+  ```
+
+  ### Non-Functional Criteria
+  - Performance: [response time / throughput requirement]
+  - Security: [auth / authz / input validation requirements]
+  - Accessibility: [WCAG compliance if UI]
+output: "acceptance-criteria.feature file usable by Cucumber/Playwright"

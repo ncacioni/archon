@@ -1,0 +1,62 @@
+id: migration-template
+description: "Database migration template with up/down scripts"
+when_to_use: "When introducing any schema change — new table, column, index, or constraint"
+input:
+  - name: migration_name
+    type: string
+    required: true
+    description: "Descriptive name for the migration (snake_case)"
+  - name: target_db
+    type: string
+    required: false
+    description: "Database engine: postgres, mysql, sqlite (default: postgres)"
+template: |
+  ## Migration: {{migration_name}}
+
+  **File:** `migrations/[timestamp]_{{migration_name}}.sql`
+  **Target DB:** {{target_db}}
+  **Author:** [developer]
+  **Date:** [date]
+
+  ### UP Migration
+  ```sql
+  -- Migration: {{migration_name}}
+  -- Description: [what this migration does]
+  -- Rollback: See DOWN section
+
+  BEGIN;
+
+  -- [DDL statements here]
+  -- Example:
+  -- CREATE TABLE IF NOT EXISTS example (
+  --   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  --   name VARCHAR(255) NOT NULL,
+  --   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  --   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  -- );
+  --
+  -- CREATE INDEX idx_example_name ON example(name);
+
+  COMMIT;
+  ```
+
+  ### DOWN Migration (Rollback)
+  ```sql
+  -- Rollback: {{migration_name}}
+
+  BEGIN;
+
+  -- [Reverse DDL statements — DROP TABLE, DROP COLUMN, etc.]
+  -- IMPORTANT: Verify no data loss before running in production
+
+  COMMIT;
+  ```
+
+  ### Pre-flight Checklist
+  - [ ] Migration tested on local dev environment
+  - [ ] Rollback tested successfully
+  - [ ] No data loss on rollback
+  - [ ] Long-running migration? Add CONCURRENTLY / batching
+  - [ ] Indexes created CONCURRENTLY in production
+  - [ ] Backup taken before running in production
+output: "migration SQL files: [timestamp]_{{migration_name}}_up.sql + _down.sql"
