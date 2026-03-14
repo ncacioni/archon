@@ -1,0 +1,82 @@
+id: pipeline-contract
+description: "Data pipeline contract defining source, schema, SLA, and ownership"
+when_to_use: "During discovery or architecture phase when defining data pipeline interfaces between systems"
+input:
+  - name: pipeline_name
+    type: string
+    required: true
+    description: "Pipeline name (e.g. orders_ingestion, revenue_reporting)"
+  - name: source_system
+    type: string
+    required: true
+    description: "System that produces the data"
+  - name: target_system
+    type: string
+    required: true
+    description: "System that consumes the data"
+  - name: frequency
+    type: string
+    required: true
+    description: "How often data flows (real-time, hourly, daily, etc.)"
+template: |
+  ## Pipeline Contract: {{pipeline_name}}
+
+  ### Overview
+
+  | Field | Value |
+  |-------|-------|
+  | Pipeline | {{pipeline_name}} |
+  | Source | {{source_system}} |
+  | Target | {{target_system}} |
+  | Frequency | {{frequency}} |
+  | Owner | [team/person] |
+  | Status | Draft |
+
+  ### Schema Contract
+
+  | Column | Type | Nullable | Description |
+  |--------|------|----------|-------------|
+  | | | | |
+
+  **Primary Key:** [column(s)]
+  **Partition Key:** [column, usually date]
+  **Grain:** [one row per ...]
+
+  ### Quality Expectations
+
+  | Check | Threshold | Action on Failure |
+  |-------|-----------|-------------------|
+  | Row count | > 0 | Alert + block downstream |
+  | Null rate on PK | 0% | Reject batch |
+  | Freshness | < [N] hours | Alert |
+  | Duplicate rate | 0% on PK | Deduplicate |
+  | Schema drift | No removed columns | Alert + manual review |
+
+  ### SLA
+
+  | Metric | Target | Measurement |
+  |--------|--------|-------------|
+  | Data available by | [time UTC] | Airflow task completion |
+  | Max latency | [N] minutes/hours | Source timestamp vs load timestamp |
+  | Uptime | 99.X% | Monthly success rate |
+
+  ### Failure & Recovery
+
+  - **Retry policy:** [N] retries with [strategy]
+  - **Backfill strategy:** [idempotent reload / incremental catch-up]
+  - **Alert channels:** [Slack channel / email / PagerDuty]
+  - **Escalation:** [who to contact if automated recovery fails]
+
+  ### Change Management
+
+  - Schema changes require [N] days notice
+  - Breaking changes (column removal, type change) require version bump
+  - Additive changes (new columns) are non-breaking
+  - Contract reviewed every [N] months
+
+  ### Dependencies
+
+  ```
+  [upstream_pipeline] → {{pipeline_name}} → [downstream_pipeline/dashboard]
+  ```
+output: "Pipeline contract document with schema, SLA, quality checks, and ownership"

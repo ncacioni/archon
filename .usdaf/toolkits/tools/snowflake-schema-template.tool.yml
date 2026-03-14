@@ -1,0 +1,107 @@
+id: snowflake-schema-template
+description: "Snowflake schema design with clustering, partitioning, and access control"
+when_to_use: "During architecture phase when designing Snowflake warehouse structure"
+input:
+  - name: database_name
+    type: string
+    required: true
+    description: "Snowflake database name"
+  - name: schemas
+    type: array
+    required: true
+    description: "List of schema names (e.g. raw, staging, analytics, scratch)"
+  - name: tables
+    type: array
+    required: false
+    description: "Key tables to define with their target schema"
+template: |
+  ## Snowflake Schema Design: {{database_name}}
+
+  ### Database & Schema Structure
+
+  ```sql
+  -- Database
+  CREATE DATABASE IF NOT EXISTS {{database_name}};
+
+  {{#each schemas}}
+  CREATE SCHEMA IF NOT EXISTS {{../database_name}}.{{this}};
+  {{/each}}
+  ```
+
+  ### Recommended Schema Layering
+
+  | Schema | Purpose | Access | Managed By |
+  |--------|---------|--------|------------|
+  | RAW | Raw ingested data, append-only | Loader role only | Airflow / Fivetran |
+  | STAGING | Cleaned, renamed, typed (dbt staging) | Transform role | dbt |
+  | ANALYTICS | Business-ready models (dbt marts) | Analyst role + BI | dbt |
+  | SCRATCH | Ad-hoc exploration, temp tables | Individual users | Manual |
+
+  ### Table Template
+
+  ```sql
+  CREATE TABLE IF NOT EXISTS {{database_name}}.[schema].[table_name] (
+      -- Surrogate key (if mart/dim)
+      -- [entity]_key VARCHAR(32) NOT NULL,
+
+      -- Natural key
+      [entity]_id VARCHAR NOT NULL,
+
+      -- Dimensions
+      [columns],
+
+      -- Timestamps
+      created_at TIMESTAMP_NTZ NOT NULL,
+      updated_at TIMESTAMP_NTZ NOT NULL,
+
+      -- dbt metadata
+      _loaded_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
+  )
+  CLUSTER BY ([frequently_filtered_column], [date_column])
+  DATA_RETENTION_TIME_IN_DAYS = 7
+  COMMENT = '[table description]';
+  ```
+
+  ### Warehouse Sizing
+
+  | Warehouse | Size | Purpose | Auto-Suspend |
+  |-----------|------|---------|-------------|
+  | LOADING_WH | X-SMALL | Raw data ingestion | 60s |
+  | TRANSFORM_WH | SMALL | dbt transformations | 120s |
+  | ANALYTICS_WH | SMALL | BI queries, dashboards | 300s |
+  | DEV_WH | X-SMALL | Ad-hoc development | 60s |
+
+  ### Access Control (RBAC)
+
+  ```sql
+  -- Roles
+  CREATE ROLE IF NOT EXISTS LOADER;      -- Writes to RAW
+  CREATE ROLE IF NOT EXISTS TRANSFORMER;  -- Reads RAW, writes STAGING + ANALYTICS
+  CREATE ROLE IF NOT EXISTS ANALYST;      -- Reads ANALYTICS + SCRATCH
+  CREATE ROLE IF NOT EXISTS ADMIN;        -- Full access
+
+  -- Grants
+  GRANT USAGE ON DATABASE {{database_name}} TO ROLE LOADER;
+  GRANT USAGE ON SCHEMA {{database_name}}.RAW TO ROLE LOADER;
+  GRANT CREATE TABLE ON SCHEMA {{database_name}}.RAW TO ROLE LOADER;
+
+  GRANT USAGE ON DATABASE {{database_name}} TO ROLE TRANSFORMER;
+  GRANT USAGE ON ALL SCHEMAS IN DATABASE {{database_name}} TO ROLE TRANSFORMER;
+  GRANT SELECT ON ALL TABLES IN SCHEMA {{database_name}}.RAW TO ROLE TRANSFORMER;
+  GRANT ALL ON SCHEMA {{database_name}}.STAGING TO ROLE TRANSFORMER;
+  GRANT ALL ON SCHEMA {{database_name}}.ANALYTICS TO ROLE TRANSFORMER;
+
+  GRANT USAGE ON DATABASE {{database_name}} TO ROLE ANALYST;
+  GRANT USAGE ON SCHEMA {{database_name}}.ANALYTICS TO ROLE ANALYST;
+  GRANT SELECT ON ALL TABLES IN SCHEMA {{database_name}}.ANALYTICS TO ROLE ANALYST;
+  ```
+
+  ### Checklist
+  - [ ] Schemas follow layered pattern (raw → staging → analytics)
+  - [ ] Tables have appropriate clustering keys for query patterns
+  - [ ] Data retention configured per schema sensitivity
+  - [ ] RBAC roles follow least-privilege principle
+  - [ ] Warehouses auto-suspend configured to control costs
+  - [ ] Time Travel retention set appropriately
+  - [ ] Sensitive columns tagged with OBJECT TAGGING for governance
+output: "Snowflake DDL + warehouse config + RBAC grants + design checklist"

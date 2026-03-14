@@ -92,14 +92,16 @@ additional responsibilities and 8 additional agents (26-33):
 ### Phase 0: Team Selection (USDAF Only)
 When a user wants to start a USDAF project:
 1. Ask them to describe their project scope
-2. Recommend a team preset from `Arch standard/team-presets.md`:
+2. Recommend a team preset from `docs/team-presets.md`:
    - Full Stack App, API Service, Security Hardening,
    - Documentation, Data Pipeline, Frontend App, Minimum Viable
+   - **Solo Dev, Solo Dev — Data Engineering, Solo Dev — Web/Mobile App**
 3. Present the mandatory + recommended agents for that preset
 4. Ask: "Which agents should be on this project's team?"
 5. Let them confirm or customize
-6. Instruct Backlog Manager (28) to initialize backlog/ directory
-7. Begin Phase 1: Discovery & Specs
+6. For team presets: Instruct Backlog Manager (28) to initialize backlog/ directory
+7. For solo-dev presets: Skip backlog initialization, use lightweight task tracking
+8. Begin Phase 1: Discovery & Specs
 
 ### Spec-Driven Rule
 Under USDAF, NO implementation begins until Spec Writer (27) has produced
@@ -111,5 +113,88 @@ and the team has approved all specifications in Phase 1. This is non-negotiable.
 - 27-Spec Writer (specs are non-negotiable)
 - 28-Backlog Manager (task tracking is non-negotiable)
 
-Reference: `Arch standard/USDAF.md` for complete framework.
+Reference: `docs/USDAF.md` for complete framework.
+
+---
+
+## Solo Dev Mode
+
+When the user is working alone (indicated by selecting a `solo-dev` preset,
+or by stating they work solo), activate Solo Dev Mode. All USDAF principles
+still apply — spec-first, security review, phase gates — but adapted for
+a single person.
+
+### How Solo Dev Mode Differs
+
+1. **You ARE every agent**: Instead of dispatching to separate subagent
+   instances, you assume each active agent's role sequentially within the
+   same conversation. Announce the role switch clearly:
+   `"[As 05-Data Architect] Here's the domain model based on the requirements..."`
+
+2. **The user is the final approver at every gate**: No Architecture Board
+   or Product Owner to defer to. Present gate artifacts and ask the user
+   to approve before moving on.
+
+3. **Lighter ceremony**: No sprint planning, no velocity tracking, no
+   backlog/ directory. Use a simple task list within the conversation.
+
+4. **Security is advisory, not blocking**: Agent 08 still reviews, but
+   instead of hard veto power, present security findings as recommendations
+   with severity levels. The user decides what to address now vs. later.
+   Critical findings (hardcoded secrets, injection vulnerabilities) are
+   still flagged as blockers.
+
+5. **Phases can overlap**: If the project is small enough, you can combine
+   Discovery + Spec + Architecture into a single pass. Always keep Security
+   review as a distinct step before Implementation.
+
+### Solo Dev Presets
+
+| Preset | Best For | Mandatory Agents |
+|--------|----------|-----------------|
+| `solo-dev` | Any project | 00, 02, 08, 12, 14, 17, 27 |
+| `solo-dev-data` | Pipelines, ETL, analytics | 00, 02, 05, 07, 08, 14, 17, 27, 33 |
+| `solo-dev-app` | Web/mobile apps | 00, 02, 06, 08, 12, 13, 14, 15, 17, 27 |
+
+### Solo Dev Workflow
+
+```
+User describes project
+        │
+        ▼
+[Phase 0] Select solo-dev preset → confirm agents
+        │
+        ▼
+[Phase 1] As 02-Requirements: elicit requirements
+          As 27-Spec Writer: produce specs
+          → User approves specs
+        │
+        ▼
+[Phase 2] As relevant architects: validate specs
+          → User approves architecture
+        │
+        ▼
+[Phase 3] As 08-Security: checklist review of specs
+          → Flag issues, user decides priority
+        │
+        ▼
+[Phase 4] As implementation agents: build (Domain → Adapters → UI)
+          Each component validated against specs
+        │
+        ▼
+[Phase 5] As 17-Test Architect: define test strategy
+          → User implements or asks for test code
+        │
+        ▼
+[Done] Deliver final output
+```
+
+### When to Suggest Leaving Solo Dev Mode
+
+If the project grows beyond what one person can reasonably handle, suggest
+switching to a full team preset. Indicators:
+- More than 3 bounded contexts in the domain model
+- Multiple deployment targets (e.g., API + worker + frontend + mobile)
+- Compliance requirements (GDPR, SOC2, PCI) that need dedicated attention
+- The user explicitly asks for more rigor
 ```

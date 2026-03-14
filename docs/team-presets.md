@@ -295,6 +295,103 @@ recommended:
 
 ---
 
+## Preset: Solo Dev — Base
+
+**Use when**: Working alone on any project. Lightweight core team that covers spec-driven development, basic security, and quality without the overhead of full team coordination. Add specialists from the recommended list based on project type.
+
+```yaml
+preset: solo-dev
+description: "Single developer, spec-first, lightweight agent selection"
+
+mandatory:
+  - 00-orchestrator              # Coordinates phases (solo mode: sequential, not dispatch)
+  - 02-requirements-architect    # FR/NFR elicitation — even solo, requirements matter
+  - 08-security-architect        # Security review (light-touch, checklist-focused)
+  - 12-domain-logic              # Core business logic, entities, use cases
+  - 14-adapters                  # Infrastructure layer, DB access, external APIs
+  - 17-test-architect            # Test strategy — keep quality even when moving fast
+  - 27-spec-writer               # Specs before code — the foundation of USDAF
+
+recommended:
+  - 05-data-architect            # If data modeling beyond basic CRUD
+  - 06-integration-architect     # If building or consuming APIs
+  - 15-frontend-architect        # If building UI
+  - 19-code-review               # For a second-opinion pass before shipping
+  - 21-cicd                      # If setting up deployment pipeline
+  - 33-data-engineer             # If ETL, migrations, or data pipelines
+```
+
+**Solo Dev Workflow** (simplified phases):
+1. **Discovery**: Requirements Architect (02) structures what you want to build
+2. **Spec**: Spec Writer (27) produces specs (OpenAPI, schema, wireframes as needed)
+3. **Security**: Security Architect (08) does a checklist review of the spec
+4. **Build**: Domain Logic (12) → Adapters (14) → any active frontend/integration agents
+5. **Test**: Test Architect (17) defines strategy, you implement
+6. **Ship**: CI/CD (21) if active, otherwise manual deploy
+
+**Note**: In solo mode, the orchestrator runs phases sequentially within the same conversation rather than dispatching to separate subagent instances. The user (you) is the final approver at every gate.
+
+---
+
+## Preset: Solo Dev — Data Engineering
+
+**Use when**: Working alone on data pipelines, ETL, analytics, or data platform projects. Extends the solo-dev base with data-specific agents.
+
+```yaml
+preset: solo-dev-data
+description: "Solo data engineer — pipelines, ETL, analytics, data platform"
+
+mandatory:
+  - 00-orchestrator
+  - 02-requirements-architect
+  - 05-data-architect            # Domain model, ERD, data classification
+  - 07-infrastructure            # Cloud infra, IaC (Airflow, Snowflake, etc.)
+  - 08-security-architect        # Data security, PII, encryption at rest
+  - 14-adapters                  # Connectors, DB access, API clients
+  - 17-test-architect            # Data quality tests, pipeline validation
+  - 27-spec-writer               # Schema specs, pipeline contracts
+  - 33-data-engineer             # ETL, migrations, CDC, pipeline patterns
+
+recommended:
+  - 03-compliance                # If PII/GDPR/SOC2 applies
+  - 06-integration-architect     # If exposing data via APIs
+  - 10-secrets-crypto            # If handling sensitive data / encryption
+  - 22-observability             # Pipeline monitoring, alerting, SLAs
+```
+
+---
+
+## Preset: Solo Dev — Web/Mobile App
+
+**Use when**: Working alone on a web or mobile application (personal projects, side projects, MVPs).
+
+```yaml
+preset: solo-dev-app
+description: "Solo developer — web or mobile application"
+
+mandatory:
+  - 00-orchestrator
+  - 02-requirements-architect
+  - 06-integration-architect     # API contracts (OpenAPI)
+  - 08-security-architect        # Auth, XSS, OWASP basics
+  - 12-domain-logic              # Business logic
+  - 13-app-services              # Use case orchestration
+  - 14-adapters                  # DB repos, external API clients
+  - 15-frontend-architect        # UI architecture, state management
+  - 17-test-architect            # Test strategy
+  - 27-spec-writer               # API spec, wireframes, DB schema
+
+recommended:
+  - 05-data-architect            # If complex data model
+  - 09-iam                       # If auth beyond basic (OAuth, RBAC)
+  - 16-ui-builder                # If complex UI components
+  - 19-code-review               # Pre-ship quality pass
+  - 21-cicd                      # If automated deployment
+  - 32-ux-researcher             # If user-facing product
+```
+
+---
+
 ## Custom Team Configuration
 
 Users can always customize by adding/removing agents:

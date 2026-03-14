@@ -1,0 +1,129 @@
+id: airflow-dag-template
+description: "Airflow DAG skeleton with best practices for scheduling and error handling"
+when_to_use: "During architecture or implementation phase when designing data pipeline orchestration"
+input:
+  - name: dag_id
+    type: string
+    required: true
+    description: "DAG identifier (snake_case, e.g. load_orders_daily)"
+  - name: schedule
+    type: string
+    required: true
+    description: "Cron expression or preset (@daily, @hourly, etc.)"
+  - name: tasks
+    type: array
+    required: true
+    description: "List of task names in execution order"
+  - name: dag_type
+    type: string
+    required: false
+    description: "Type: elt, etl, dbt, sensor, or generic"
+template: |
+  ## Airflow DAG: {{dag_id}}
+
+  **Schedule:** `{{schedule}}`
+  **Type:** {{dag_type}}
+
+  ### DAG Definition
+
+  ```python
+  # dags/{{dag_id}}.py
+  from datetime import datetime, timedelta
+  from airflow import DAG
+  from airflow.operators.empty import EmptyOperator
+  # Import operators as needed:
+  # from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
+  # from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig
+  # from airflow.sensors.external_task import ExternalTaskSensor
+
+  default_args = {
+      "owner": "data-engineering",
+      "depends_on_past": False,
+      "email_on_failure": True,
+      "email_on_retry": False,
+      "retries": 2,
+      "retry_delay": timedelta(minutes=5),
+      "retry_exponential_backoff": True,
+      "max_retry_delay": timedelta(minutes=30),
+  }
+
+  with DAG(
+      dag_id="{{dag_id}}",
+      default_args=default_args,
+      description="[DAG description]",
+      schedule="{{schedule}}",
+      start_date=datetime(2024, 1, 1),
+      catchup=False,
+      max_active_runs=1,
+      tags=["[team]", "[domain]", "{{dag_type}}"],
+      doc_md=__doc__,
+  ) as dag:
+
+      start = EmptyOperator(task_id="start")
+      end = EmptyOperator(task_id="end", trigger_rule="none_failed")
+
+      {{#each tasks}}
+      # {{this}}
+      # task_{{@index}} = [Operator](task_id="{{this}}", ...)
+      {{/each}}
+
+      # Task dependencies
+      # start >> task_0 >> task_1 >> ... >> end
+  ```
+
+  {% if dag_type == "dbt" %}
+  ### dbt Integration (using Cosmos)
+
+  ```python
+  from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, RenderConfig
+
+  dbt_tasks = DbtTaskGroup(
+      group_id="dbt_transform",
+      project_config=ProjectConfig(dbt_project_path="/opt/airflow/dbt"),
+      profile_config=ProfileConfig(
+          profile_name="snowflake",
+          target_name="prod",
+          profiles_yml_filepath="/opt/airflow/dbt/profiles.yml",
+      ),
+      render_config=RenderConfig(select=["path:models/staging"]),
+      operator_args={"install_deps": True},
+  )
+
+  start >> dbt_tasks >> end
+  ```
+  {% endif %}
+
+  ### Task Dependency Diagram
+
+  ```
+  {{#each tasks}}
+  [{{this}}] {{#unless @last}}→ {{/unless}}
+  {{/each}}
+  ```
+
+  ### Alerting & SLA
+
+  ```python
+  # SLA miss callback
+  def sla_miss_callback(dag, task_list, blocking_task_list, slas, blocking_tis):
+      # Send alert to Slack / PagerDuty / email
+      pass
+
+  # Add to DAG:
+  # sla_miss_callback=sla_miss_callback
+  # Add to tasks:
+  # sla=timedelta(hours=2)
+  ```
+
+  ### Checklist
+  - [ ] DAG id follows naming convention: [action]_[entity]_[frequency]
+  - [ ] Schedule uses cron, not timedelta (for predictable execution)
+  - [ ] catchup=False unless historical backfill is intended
+  - [ ] max_active_runs=1 to prevent overlapping runs
+  - [ ] Retries configured with exponential backoff
+  - [ ] Tags set for filtering in Airflow UI
+  - [ ] SLA configured for critical pipelines
+  - [ ] Idempotent tasks (safe to re-run)
+  - [ ] No hardcoded credentials (use Airflow Connections)
+  - [ ] Sensors have timeout and poke_interval configured
+output: "Airflow DAG Python file + dependency diagram + ops checklist"

@@ -1,0 +1,16 @@
+agent: "33-data-engineer"
+tools:
+  - id: dbt-model-template
+    description: "Generate dbt model with staging/intermediate/mart layering"
+  - id: dbt-test-template
+    description: "Generate dbt schema tests and data quality assertions"
+  - id: snowflake-schema-template
+    description: "Snowflake schema design with clustering, partitioning, and access control"
+  - id: airflow-dag-template
+    description: "Airflow DAG skeleton with best practices for scheduling and error handling"
+  - id: pipeline-contract
+    description: "Data pipeline contract defining source, schema, SLA, and ownership"
+  - id: erd-generator
+    description: "Generate Entity-Relationship Diagram from domain model"
+  - id: migration-template
+    description: "Database migration template with up/down scripts"

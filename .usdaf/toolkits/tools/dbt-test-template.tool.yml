@@ -1,0 +1,78 @@
+id: dbt-test-template
+description: "Generate dbt schema tests and data quality assertions"
+when_to_use: "During QA phase or when defining data quality requirements for dbt models"
+input:
+  - name: model_name
+    type: string
+    required: true
+    description: "Name of the dbt model to test"
+  - name: columns
+    type: array
+    required: true
+    description: "List of column names that need test coverage"
+  - name: business_rules
+    type: array
+    required: false
+    description: "Business rules to enforce as custom tests"
+template: |
+  ## dbt Tests: {{model_name}}
+
+  ### Schema Tests (models/_schema.yml)
+
+  ```yaml
+  models:
+    - name: {{model_name}}
+      description: "[model description]"
+      columns:
+        {{#each columns}}
+        - name: {{this}}
+          description: "[column description]"
+          tests:
+            - not_null
+            # Add as applicable:
+            # - unique
+            # - accepted_values:
+            #     values: ['value1', 'value2']
+            # - relationships:
+            #     to: ref('other_model')
+            #     field: id
+        {{/each}}
+  ```
+
+  ### Custom Data Quality Tests
+
+  ```sql
+  -- tests/assert_{{model_name}}_[rule_name].sql
+  -- Returns rows that FAIL the test (0 rows = pass)
+
+  {{#each business_rules}}
+  -- Test: {{this}}
+  -- select [columns]
+  -- from {{ "{{" }} ref('{{../model_name}}') {{ "}}" }}
+  -- where [violation condition]
+
+  {{/each}}
+  ```
+
+  ### Source Freshness (if staging model)
+
+  ```yaml
+  sources:
+    - name: [source_name]
+      freshness:
+        warn_after: {count: 12, period: hour}
+        error_after: {count: 24, period: hour}
+      loaded_at_field: _loaded_at
+      tables:
+        - name: [table_name]
+  ```
+
+  ### Test Coverage Checklist
+  - [ ] Primary key: unique + not_null
+  - [ ] Foreign keys: relationships test to parent model
+  - [ ] Required fields: not_null
+  - [ ] Enum fields: accepted_values
+  - [ ] Business rules: custom singular tests
+  - [ ] Row count: not empty (custom test or dbt_utils.at_least_one)
+  - [ ] Source freshness configured for staging models
+output: "dbt schema YAML + custom test SQL + freshness config"

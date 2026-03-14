@@ -1,0 +1,127 @@
+id: dbt-model-template
+description: "Generate dbt model with staging/intermediate/mart layering"
+when_to_use: "When designing data transformations in dbt during Architecture or Implementation phases"
+input:
+  - name: model_name
+    type: string
+    required: true
+    description: "Name of the model (e.g. stg_orders, int_order_items, fct_revenue)"
+  - name: layer
+    type: string
+    required: true
+    description: "Layer: staging, intermediate, or mart"
+  - name: source_name
+    type: string
+    required: true
+    description: "Source or upstream model this reads from"
+  - name: grain
+    type: string
+    required: false
+    description: "Grain of the model (e.g. one row per order, per day per customer)"
+template: |
+  ## dbt Model: {{model_name}}
+
+  **Layer:** {{layer}}
+  **Source:** {{source_name}}
+  **Grain:** {{grain}}
+
+  ### Model SQL
+
+  {% if layer == "staging" %}
+  ```sql
+  -- models/staging/{{model_name}}.sql
+  with source as (
+      select * from {{ "{{" }} source('{{source_name}}', '[table]') {{ "}}" }}
+  ),
+
+  renamed as (
+      select
+          -- Primary key
+          [id_column]::varchar as [entity]_id,
+
+          -- Dimensions
+          [columns with snake_case renaming],
+
+          -- Timestamps
+          [timestamp_columns]::timestamp_ntz as [name]_at
+
+      from source
+  )
+
+  select * from renamed
+  ```
+  {% elif layer == "intermediate" %}
+  ```sql
+  -- models/intermediate/{{model_name}}.sql
+  with [upstream_model] as (
+      select * from {{ "{{" }} ref('[upstream]') {{ "}}" }}
+  ),
+
+  transformed as (
+      select
+          -- Keys
+          [join keys],
+
+          -- Business logic
+          [transformations, aggregations, filters],
+
+          -- Metadata
+          current_timestamp() as _loaded_at
+
+      from [upstream_model]
+      [joins, filters]
+  )
+
+  select * from transformed
+  ```
+  {% elif layer == "mart" %}
+  ```sql
+  -- models/marts/{{model_name}}.sql
+  with [source_models] as (
+      select * from {{ "{{" }} ref('[model]') {{ "}}" }}
+  ),
+
+  final as (
+      select
+          -- Dimensions
+          [dimension_columns],
+
+          -- Measures
+          [aggregated_metrics],
+
+          -- Metadata
+          current_timestamp() as _loaded_at
+
+      from [source_models]
+      [joins]
+      [group by if aggregate]
+  )
+
+  select * from final
+  ```
+  {% endif %}
+
+  ### Schema YAML
+
+  ```yaml
+  # models/{{layer}}/_{{layer}}__models.yml
+  models:
+    - name: {{model_name}}
+      description: "[describe what this model represents]"
+      columns:
+        - name: [primary_key]
+          description: "Primary key"
+          tests:
+            - unique
+            - not_null
+        # Add columns with descriptions and tests
+  ```
+
+  ### Checklist
+  - [ ] Model follows naming convention: stg_, int_, fct_, dim_
+  - [ ] Grain is documented and enforced with unique test
+  - [ ] Source columns renamed to snake_case in staging
+  - [ ] No business logic in staging layer
+  - [ ] Intermediate models are not exposed to BI tools
+  - [ ] Mart models are the only ones referenced by dashboards
+output: "dbt model SQL + schema YAML + validation checklist"
