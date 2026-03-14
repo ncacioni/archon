@@ -1,0 +1,54 @@
+id: openapi-validator
+description: "Validate OpenAPI spec completeness and consistency"
+when_to_use: "When reviewing or approving API contracts before implementation begins (Phase 1 gate)"
+input:
+  - name: spec_path
+    type: string
+    required: true
+    description: "Path to the OpenAPI YAML/JSON file"
+  - name: api_name
+    type: string
+    required: true
+    description: "Human-readable name of the API being validated"
+template: |
+  ## OpenAPI Validation: {{api_name}}
+  **Spec:** {{spec_path}}
+
+  ### Structural Completeness
+  - [ ] `openapi` version declared (3.1.x preferred)
+  - [ ] `info` block: title, version, description present
+  - [ ] `servers` defined for all environments
+  - [ ] All paths have at least one operation
+  - [ ] All operations have: summary, description, operationId
+  - [ ] All operations have at least one response defined
+  - [ ] `200` / `201` response documented for success cases
+  - [ ] `400`, `401`, `403`, `404`, `500` responses documented where applicable
+
+  ### Schema Quality
+  - [ ] Request bodies use `$ref` to named schemas (not inline)
+  - [ ] Response bodies use `$ref` to named schemas
+  - [ ] All schemas have `description` fields
+  - [ ] Enums are documented
+  - [ ] Required fields explicitly listed
+  - [ ] No `additionalProperties: true` without justification
+
+  ### Security
+  - [ ] `securitySchemes` defined (Bearer JWT or OAuth2)
+  - [ ] Security applied at operation or global level
+  - [ ] Public endpoints explicitly marked with `security: []`
+
+  ### Consistency
+  - [ ] Consistent naming: camelCase for JSON properties
+  - [ ] Consistent error response schema across all endpoints
+  - [ ] Pagination pattern consistent across list endpoints
+  - [ ] `operationId` values unique across entire spec
+
+  ### Issues
+  | Path | Operation | Issue | Severity |
+  |------|-----------|-------|----------|
+  | | | | |
+
+  ### Decision
+  - [ ] APPROVED
+  - [ ] REJECTED — fix required items before implementation
+output: "openapi-validation-report.md"

@@ -1,0 +1,52 @@
+id: npm-search
+description: "Search npm registry for packages matching requirements"
+when_to_use: "When scouting libraries for a new feature or evaluating build-vs-buy (agent 25)"
+input:
+  - name: search_query
+    type: string
+    required: true
+    description: "Search terms describing the functionality needed"
+  - name: requirements
+    type: array
+    required: false
+    description: "List of must-have criteria (e.g. ESM, TypeScript, no peer deps)"
+template: |
+  ## npm Search: {{search_query}}
+
+  ### Search Commands
+  ```bash
+  # Basic search
+  npm search {{search_query}} --json | head -20
+
+  # Via npms.io API (richer metadata)
+  curl "https://api.npms.io/v2/search?q={{search_query}}&size=10" | jq '.results[] | {name: .package.name, version: .package.version, description: .package.description, score: .score.final}'
+  ```
+
+  ### Candidate Packages
+
+  | Package | Version | Weekly Downloads | Size (gzip) | License | TS Support | Last Published |
+  |---------|---------|-----------------|-------------|---------|------------|----------------|
+  | [pkg 1] | | | | | | |
+  | [pkg 2] | | | | | | |
+  | [pkg 3] | | | | | | |
+
+  ### Requirements Checklist
+  | Requirement | Pkg 1 | Pkg 2 | Pkg 3 |
+  |-------------|-------|-------|-------|
+  | ESM support | | | |
+  | TypeScript types | | | |
+  | Zero/minimal deps | | | |
+  | Active maintenance | | | |
+  | [custom req] | | | |
+
+  ### Recommendation
+  **Recommended:** [package name]
+  **Rationale:** [why this package over alternatives]
+  **Risk:** [any concerns — abandonment, CVEs, license]
+  **Alternative if rejected:** [package or native implementation]
+
+  ### Links
+  - npm: https://www.npmjs.com/package/[package]
+  - Bundlephobia: https://bundlephobia.com/package/[package]
+  - GitHub: [repo link]
+output: "npm-search-report.md with ranked candidates and recommendation"

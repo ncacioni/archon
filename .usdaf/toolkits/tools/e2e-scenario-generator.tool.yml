@@ -1,0 +1,82 @@
+id: e2e-scenario-generator
+description: "Generate E2E test scenarios from user stories"
+when_to_use: "When translating accepted user stories into Playwright/Cypress E2E test scenarios (agent 17/18)"
+input:
+  - name: user_story
+    type: string
+    required: true
+    description: "The user story to generate E2E scenarios for"
+  - name: test_framework
+    type: string
+    required: false
+    description: "E2E framework: playwright or cypress (default: playwright)"
+template: |
+  ## E2E Scenarios: {{user_story}}
+  **Framework:** {{test_framework}}
+
+  ### Scenario 1: Happy Path
+  ```typescript
+  // {{test_framework}} test
+  test('should [main success outcome]', async ({ page }) => {
+    // Arrange — set up initial state
+    await page.goto('/[path]');
+    // [any auth or data setup]
+
+    // Act — perform the user action
+    await page.getByRole('[role]', { name: '[label]' }).click();
+    await page.getByLabel('[label]').fill('[value]');
+    await page.getByRole('button', { name: '[submit label]' }).click();
+
+    // Assert — verify expected outcome
+    await expect(page.getByText('[success message]')).toBeVisible();
+    await expect(page).toHaveURL('/[expected-path]');
+  });
+  ```
+
+  ### Scenario 2: Validation Error
+  ```typescript
+  test('should show error when [invalid input]', async ({ page }) => {
+    await page.goto('/[path]');
+
+    // Submit with invalid/missing data
+    await page.getByRole('button', { name: '[submit]' }).click();
+
+    // Verify error state
+    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.getByText('[error message]')).toBeVisible();
+  });
+  ```
+
+  ### Scenario 3: Unauthorized Access
+  ```typescript
+  test('should redirect to login when not authenticated', async ({ page }) => {
+    await page.goto('/[protected-path]');
+    await expect(page).toHaveURL('/login');
+  });
+  ```
+
+  ### Scenario 4: [Domain-Specific Edge Case]
+  ```typescript
+  test('should handle [edge case]', async ({ page }) => {
+    // [setup edge case state]
+    // [action]
+    // [assertion]
+  });
+  ```
+
+  ### Test Data Requirements
+  - [List of fixtures or database seeds needed]
+  - [Any API mocks required]
+
+  ### Page Object Model Recommendation
+  ```typescript
+  // Create page object: tests/pages/[feature].page.ts
+  export class [Feature]Page {
+    constructor(private page: Page) {}
+
+    async navigate() { await this.page.goto('/[path]'); }
+    async submit(data: [DataType]) { /* ... */ }
+    async getErrorMessage() { return this.page.getByRole('alert'); }
+  }
+  ```
+output: "e2e-scenarios-[feature].spec.ts Playwright test file"

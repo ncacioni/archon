@@ -1,0 +1,102 @@
+id: api-contract-template
+description: "REST API contract template with standard patterns"
+when_to_use: "When designing a new REST API or endpoint group (Phase 1, agent 06)"
+input:
+  - name: resource_name
+    type: string
+    required: true
+    description: "The resource being exposed (e.g. users, orders, events)"
+  - name: base_path
+    type: string
+    required: true
+    description: "Base API path (e.g. /api/v1/users)"
+template: |
+  ## API Contract: {{resource_name}}
+  **Base Path:** {{base_path}}
+  **Version:** v1
+
+  ### Standard CRUD Endpoints
+
+  #### List {{resource_name}}
+  ```
+  GET {{base_path}}
+  Authorization: Bearer <token>
+
+  Query Parameters:
+    page     integer  Page number (default: 1)
+    limit    integer  Items per page (default: 20, max: 100)
+    sort     string   Sort field (e.g. created_at)
+    order    string   asc | desc (default: desc)
+    [filter] string   Domain-specific filter params
+
+  Response 200:
+  {
+    "data": [ { ...{{resource_name}} object... } ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 150,
+      "pages": 8
+    }
+  }
+  ```
+
+  #### Get single {{resource_name}}
+  ```
+  GET {{base_path}}/:id
+  Authorization: Bearer <token>
+
+  Response 200: { "data": { ...{{resource_name}} object... } }
+  Response 404: { "error": { "code": "NOT_FOUND", "message": "..." } }
+  ```
+
+  #### Create {{resource_name}}
+  ```
+  POST {{base_path}}
+  Authorization: Bearer <token>
+  Content-Type: application/json
+
+  Request Body: { ...required fields... }
+
+  Response 201: { "data": { ...created {{resource_name}}... } }
+  Response 400: { "error": { "code": "VALIDATION_ERROR", "details": [...] } }
+  ```
+
+  #### Update {{resource_name}}
+  ```
+  PATCH {{base_path}}/:id
+  Authorization: Bearer <token>
+  Content-Type: application/json
+
+  Request Body: { ...fields to update (partial)... }
+
+  Response 200: { "data": { ...updated {{resource_name}}... } }
+  Response 404: { "error": { "code": "NOT_FOUND", "message": "..." } }
+  ```
+
+  #### Delete {{resource_name}}
+  ```
+  DELETE {{base_path}}/:id
+  Authorization: Bearer <token>
+
+  Response 204: (no body)
+  Response 404: { "error": { "code": "NOT_FOUND", "message": "..." } }
+  ```
+
+  ### Standard Error Schema
+  ```json
+  {
+    "error": {
+      "code": "MACHINE_READABLE_CODE",
+      "message": "Human readable message",
+      "details": [...],
+      "traceId": "uuid"
+    }
+  }
+  ```
+
+  ### Auth & Security
+  - All endpoints require `Authorization: Bearer <JWT>`
+  - JWT validated against JWKS endpoint
+  - Rate limiting: [specify per endpoint]
+output: "api-contract.yaml (OpenAPI fragment) + api-contract.md documentation"

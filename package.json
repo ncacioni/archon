@@ -1,0 +1,12 @@
+{
+  "name": "usdaf",
+  "version": "2.0.0",
+  "description": "USDAF — Unified Spec-Driven Agile Framework runtime",
+  "type": "module",
+  "bin": {
+    "usdaf": "./bin/usdaf-init.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

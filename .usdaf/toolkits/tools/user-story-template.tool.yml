@@ -1,0 +1,41 @@
+id: user-story-template
+description: "Structured user story template with acceptance criteria"
+when_to_use: "When capturing new feature requirements during Phase 0 (Requirements)"
+input:
+  - name: role
+    type: string
+    required: true
+    description: "The user role (e.g. admin, developer, end user)"
+  - name: goal
+    type: string
+    required: true
+    description: "What the user wants to accomplish"
+  - name: benefit
+    type: string
+    required: true
+    description: "Why they want it / business value"
+template: |
+  ## User Story
+
+  **As a** {{role}},
+  **I want to** {{goal}},
+  **so that** {{benefit}}.
+
+  ### Acceptance Criteria
+  - Given [precondition], when [action], then [expected outcome]
+  - Given [precondition], when [action], then [expected outcome]
+  - Given [error condition], when [action], then [error handled gracefully]
+
+  ### Definition of Done
+  - [ ] Implementation complete
+  - [ ] Unit tests written and passing (>80% coverage)
+  - [ ] Integration tests passing
+  - [ ] Code reviewed
+  - [ ] Documentation updated
+  - [ ] No new security vulnerabilities introduced
+
+  ### Notes
+  - Priority: [Must/Should/Could/Won't]
+  - Estimate: [story points]
+  - Dependencies: [other stories or systems]
+output: "user-story.md artifact ready for backlog entry"

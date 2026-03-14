@@ -1,0 +1,39 @@
+id: owasp-checklist
+description: "OWASP Top 10 verification checklist for code review"
+when_to_use: "During code review gate (agent 19) or security architect review (agent 08)"
+input:
+  - name: component_type
+    type: string
+    required: true
+    description: "Type of component: api, frontend, auth, database, file-upload"
+  - name: reviewer
+    type: string
+    required: false
+    description: "Name of reviewer for sign-off"
+template: |
+  ## OWASP Top 10 Checklist — {{component_type}}
+  Reviewer: {{reviewer}} | Date: [date]
+
+  | # | Risk | Check | Pass | Notes |
+  |---|------|-------|------|-------|
+  | A01 | Broken Access Control | All endpoints enforce authz | [ ] | |
+  | A01 | Broken Access Control | No IDOR vulnerabilities | [ ] | |
+  | A02 | Cryptographic Failures | Sensitive data encrypted at rest | [ ] | |
+  | A02 | Cryptographic Failures | TLS 1.2+ enforced in transit | [ ] | |
+  | A03 | Injection | All DB queries use parameterized statements | [ ] | |
+  | A03 | Injection | Input sanitized before use in commands | [ ] | |
+  | A04 | Insecure Design | Threat model exists for this component | [ ] | |
+  | A05 | Security Misconfiguration | No default credentials or debug endpoints | [ ] | |
+  | A05 | Security Misconfiguration | Security headers configured (CSP, HSTS, etc.) | [ ] | |
+  | A06 | Vulnerable Components | npm audit passes at moderate threshold | [ ] | |
+  | A07 | Auth Failures | Brute force protection in place | [ ] | |
+  | A07 | Auth Failures | Sessions invalidated on logout | [ ] | |
+  | A08 | Integrity Failures | Subresource integrity checked | [ ] | |
+  | A09 | Logging Failures | Security events logged with correlation ID | [ ] | |
+  | A10 | SSRF | External URLs validated against allowlist | [ ] | |
+
+  ### Sign-off
+  - [ ] All critical items addressed
+  - [ ] Exceptions documented with ADR reference
+  - Reviewer: {{reviewer}}
+output: "owasp-checklist-[component].md with pass/fail status per item"
