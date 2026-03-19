@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/archon-logo.png" alt="Archon Logo" width="200">
+</p>
+
 # Archon — Intelligent Orchestrator for Claude Code
 
 Archon auto-detects what you need and activates the right AI agents. No ceremony, no phase selection — just describe what you want to build.
