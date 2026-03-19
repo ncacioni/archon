@@ -45,7 +45,7 @@ Use these for structured workflows:
 1. **Security before shipping.** Security agent always reviews before implementation ships. Security has **veto power** — hardcoded secrets, injection, auth bypass, deprecated crypto are non-negotiable blockers.
 2. **ADD before code for L/XL features.** Architectural Design Document required for large features. Specs (OpenAPI, DB schema) required for M+. Inline OK for fixes and S tasks.
 3. **Clean Architecture.** Dependencies point inward: Domain → Application → Adapters. Domain layer has zero external dependencies.
-4. **No ceremony.** Don't announce phases, don't ask which agents to use, don't reference agent IDs. Just work. Integrate outputs cohesively.
+4. **Progress over ceremony.** Don't ask which agents to use, don't reference agent IDs. Report concise status after each phase (decisions made, issues found, artifacts produced). Integrate outputs cohesively.
 5. **Specs define contracts, not implementations.** Specs come before code. Implementation decides HOW.
 
 ## How to Work

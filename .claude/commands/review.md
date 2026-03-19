@@ -35,6 +35,14 @@ Present consolidated review with:
 - **Medium/Low** (advisory)
 - Each finding: file, line, severity, category, description, suggested fix
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Report QA findings summary (number of issues by severity, key patterns found)
+- **Phase 2**: Report security findings summary (blockers, high/medium/low counts, critical items)
+- **Phase 3**: Present consolidated review — this IS the final output to the user
+
 ## Rules
 
 - Be concrete: provide file paths, line numbers, and fix suggestions

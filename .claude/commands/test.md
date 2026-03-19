@@ -38,6 +38,14 @@ Run all tests and report:
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Report test strategy (scope analyzed, pyramid breakdown, coverage gaps identified)
+- **Phase 2**: Report tests written (count by type, key scenarios covered)
+- **Phase 3**: Report execution results (pass/fail, coverage metrics, remaining gaps)
+
 ## Rules
 
 - Every acceptance criterion maps to at least one test

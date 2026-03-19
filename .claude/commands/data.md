@@ -78,6 +78,18 @@ Spawn the **qa** agent to:
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 0**: Report scope assessment (type of data work, phases that will run)
+- **Phase 1**: Report data model (entities, relationships, data classification, ERD summary)
+- **Phase 2**: Report schema/migration (DDL produced, migration strategy, indexing decisions)
+- **Phase 3**: Report pipeline design (tool choices, DAG/model structure, key transformations)
+- **Phase 4**: Report security findings (PII compliance, encryption, access control)
+- **Phase 5**: Report quality gates (checks implemented, SLA monitoring, lineage)
+- **Phase 6**: Report QA results (migration reversibility, idempotency verified, test coverage)
+
 ## Rules
 
 - Every table has mandatory audit columns (id, created_at, updated_at, created_by, updated_by, deleted_at)

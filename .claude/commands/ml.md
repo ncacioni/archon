@@ -79,6 +79,18 @@ Spawn the **qa** agent to:
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 0**: Report problem framing (ML task type, success metrics, baseline approach, data requirements)
+- **Phase 1**: Report EDA findings (data quality, distributions, key insights, feature inventory)
+- **Phase 2**: Report feature engineering results (transformations applied, feature importance, validation gates)
+- **Phase 3**: Report modeling results (baseline vs experiments, best model, evaluation metrics, fairness checks)
+- **Phase 4**: Report security findings (privacy compliance, serving security, PII handling)
+- **Phase 5**: Report MLOps setup (serving strategy, monitoring, retraining triggers)
+- **Phase 6**: Report QA results (test coverage, reproducibility verified, monitoring validated)
+
 ## Rules
 
 - Always start with a baseline before adding complexity

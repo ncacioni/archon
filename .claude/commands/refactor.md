@@ -48,6 +48,15 @@ Spawn the **qa** agent to verify:
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 0**: Report analysis (dependencies mapped, code smells found, blast radius, current test coverage)
+- **Phase 1**: Report refactoring plan (techniques to apply, ordering, risk per change, checkpoints)
+- **Phase 2**: Report implementation progress (changes applied, tests passing at each checkpoint)
+- **Phase 3**: Report verification results (regressions, architecture compliance, quality improvement metrics)
+
 ## Rules
 
 - Refactoring changes structure, not behavior — tests must pass before AND after

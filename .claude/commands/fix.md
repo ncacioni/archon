@@ -34,6 +34,14 @@ Spawn the **qa** agent to:
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Report root cause analysis (what's broken, where, why, affected code paths)
+- **Phase 2**: Report what was changed (files modified, approach taken, key decisions)
+- **Phase 3**: Report test results (tests added, all passing, regression check status)
+
 ## Rules
 
 - Fix the root cause, not just the symptom
