@@ -1,98 +1,128 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## This project uses Archon
 
-## What This Repository Is
+Archon is an intelligent orchestrator for Claude Code. It auto-detects what you need and activates the right agents.
 
-USDAF (Unified Spec-Driven Agile Framework) is a multi-agent development framework with an intelligent runtime. It contains AI agent system prompts, framework documentation, and a Node.js runtime for memory, toolkits, and subagent dispatch.
+## Active Mode: Solo
 
-## Repository Structure
+9 consolidated agents — read their prompts from `agents/solo/`:
+
+| ID | Agent | Role |
+|----|-------|------|
+| S0 | Archon | Orchestration and routing |
+| S1 | Architect | Solution design, C4, API contracts |
+| S2 | Security | Security review (STRIDE, veto power) |
+| S3 | Spec Writer | OpenAPI, DB schemas, wireframes |
+| S4 | Builder | Domain logic, app services, adapters |
+| S5 | Frontend | Components, UI, UX |
+| S6 | QA | Tests, code review, SAST |
+| S7 | DevOps | CI/CD, observability, releases, docs |
+| S8 | Data | Data modeling, pipelines, migrations |
+
+## How to work
+
+When the user asks you to do something:
+
+1. Read `.archon/config.yml` for project context and mode (solo/team)
+2. Determine the intent of the request (build, review, fix, secure, test, deploy, design, data, document, frontend)
+3. For each activated agent, read its prompt from `agents/solo/` (solo mode) or `agents/` (team mode)
+4. Security (S2) **always** reviews implementation work before shipping
+5. Specs precede code — but for quick fixes, inline spec is fine
+
+### Intent → Agent mapping
+
+| Intent | Agents activated |
+|--------|-----------------|
+| BUILD (add, create, implement) | S3 → S2 → S4 → S6 |
+| REVIEW (review, check, audit) | S6 → S2 |
+| FIX (fix, bug, error, debug) | S4 → S6 |
+| SECURE (security, auth, permissions) | S2 → S1 |
+| TEST (test, coverage, e2e) | S6 |
+| DEPLOY (deploy, release, ci/cd) | S7 |
+| DESIGN (architecture, design, schema) | S1 → S3 |
+| DATA (migration, pipeline, etl, database) | S8 → S2 |
+| DOCUMENT (document, readme, docs) | S7 |
+| FRONTEND (frontend, ui, component, react) | S5 → S6 |
+
+## Core invariants
+
+1. Security phase always runs **before** implementation ships
+2. S2 (Security) has **veto power** at any point
+3. No code is written until specs are approved (inline OK for quick fixes)
+4. Clean Architecture: dependencies point inward — Domain < App < Infrastructure < UI
+5. Domain layer has zero external dependencies
+
+## Repository structure
 
 ```
-agents/              34 agent system prompts (NN-agent-name.md format)
-docs/                Framework documentation and guides
-bin/                 CLI entry point (npx usdaf init)
-.usdaf/              v2.0 Runtime
-├── runtime/         6 modules: memory-manager, toolkit-loader, token-estimator,
-│   │                scout-service, agent-registry, maintenance
-│   └── __tests__/   50 tests (Node.js built-in test runner)
-├── skills/          6 phase skill definitions (discovery → operations)
-├── toolkits/        7 agent indices + 24 tool definitions (YAML)
-├── memory/          Persistent agent memory (auto-managed, gitignored)
-└── config.yml       Default project configuration template
-QUICKSTART.md        Entry point for new users
+agents/
+  solo/            9 consolidated agents (S0-S8) for solo mode
+  *.md             34 original agents (00-33) for team mode
+docs/              Framework documentation and guides
+bin/               CLI entry point (npx archon init)
+.archon/
+  runtime/         8 modules: memory-manager, toolkit-loader, token-estimator,
+  |                scout-service, agent-registry, maintenance, intent-router, project-state
+  |__ __tests__/   Test suite (Node.js built-in test runner)
+  skills/          6 phase skill definitions
+  toolkits/        Agent toolkit indices + tool definitions (YAML)
+  memory/          Persistent agent memory (auto-managed, gitignored)
+  config.yml       Project configuration (mode: solo | team)
 ```
 
-Key docs:
-- `docs/USDAF.md` — Master framework specification
-- `docs/MASTER-INVOCATION-GUIDE.md` — Prompt templates for invoking the framework
-- `docs/agent-certification-map.md` — Professional certifications per agent
-- `docs/team-presets.md` — YAML team configurations by project type
+## Runtime
 
-## Runtime (v2.0)
+The runtime lives in `.archon/runtime/` — Node.js ES modules, `js-yaml` as only dependency.
 
-The runtime lives in `.usdaf/runtime/` and uses Node.js ES modules with `js-yaml` as the only dependency.
-
-### Running Tests
+### Running tests
 
 ```bash
-cd .usdaf/runtime && npm install
+cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-### Key Modules
+### Key modules
 
-| Module | Exports | Purpose |
-|--------|---------|---------|
-| `memory-manager.js` | `load`, `appendLearning`, `graduate`, `compactIfNeeded` | Persistent agent memory with graduation rules |
-| `toolkit-loader.js` | `loadIndex`, `loadTool`, `listTools` | Two-level YAML toolkit loading |
-| `token-estimator.js` | `estimate`, `formatEstimate` | Token cost estimation |
-| `scout-service.js` | `loadCache`, `saveEvaluation`, `search` | OSS package evaluation cache |
-| `agent-registry.js` | `loadAgent`, `getTeamAgents`, `buildPrompt` | Agent loading + subagent prompt assembly |
-| `maintenance.js` | `shouldRun`, `audit` | Toolkit integrity + vulnerability auditing |
+| Module | Purpose |
+|--------|---------|
+| `intent-router.js` | Detect intent from user message, map to agent activation order |
+| `project-state.js` | Track feature progress (spec → security → implementation → tests → review) |
+| `agent-registry.js` | Load agents (solo or team mode), build dispatch prompts |
+| `memory-manager.js` | Persistent agent memory with graduation rules |
+| `token-estimator.js` | Token cost estimation per task |
+| `scout-service.js` | OSS package evaluation cache |
+| `toolkit-loader.js` | Two-level YAML toolkit loading |
+| `maintenance.js` | Toolkit integrity + vulnerability auditing |
 
-All modules have CLI interfaces guarded by `import.meta.url` checks. They can be run directly or imported as libraries.
+### CLI examples
 
-### Path Conventions
-
-- Agent prompts: `agents/NN-agent-name.md`
-- Toolkit indices: `.usdaf/toolkits/NN-agent-name.index.yml`
-- Tool definitions: `.usdaf/toolkits/tools/tool-name.tool.yml`
-- Agent memory: `.usdaf/memory/agents/agent-id.md` (gitignored)
-- Phase skills: `.usdaf/skills/usdaf-{phase}.md`
-
-## Agent Numbering & Layers
-
-Agents are numbered 00-33 and organized into layers:
-
-| Range | Layer |
-|-------|-------|
-| 00, 24-26, 28 | META / Agile (Orchestration) |
-| 01-03, 32 | Governance & Discovery |
-| 04-07, 27, 33 | Architecture & Specifications |
-| 08-11 | Security (Agent 08 has **veto power**) |
-| 12-16 | Implementation (Domain > App > Adapters > Frontend > UI) |
-| 17-20, 31 | Quality Assurance |
-| 21-23, 29-30 | Operations |
-
-Main agents (stay in context): 00, 08, 24. All others dispatched as subagents.
-
-## Core Framework Invariants
-
-These rules must not be violated in any agent prompt or documentation:
-1. Security phase always runs **before** implementation
-2. Agent 08 (Security Architect) has **veto power** at any phase
-3. No code is written until specs (OpenAPI, DB schema, wireframes) are approved
-4. Clean Architecture: dependencies point inward only — Domain < App < Infrastructure < UI
-5. Domain layer has zero external dependencies
-
-## Development Framework
-
-Follow USDAF phases 0-7 for all development work.
-Read `docs/USDAF.md` for the full framework.
-For each active agent, consult `docs/agent-certification-map.md`.
-
-Use the token estimator before starting:
 ```bash
-node .usdaf/runtime/token-estimator.js estimate --complexity medium
+# Detect intent
+node .archon/runtime/intent-router.js detect "add user authentication"
+
+# Check active agents for current mode
+node .archon/runtime/agent-registry.js agents
+
+# Feature tracking
+node .archon/runtime/project-state.js status
+node .archon/runtime/project-state.js pending
+
+# Token estimation
+node .archon/runtime/token-estimator.js estimate --complexity medium
+
+# Agent memory
+node .archon/runtime/memory-manager.js load S4
 ```
+
+## Team mode (34 agents)
+
+Switch to team mode in `.archon/config.yml`:
+
+```yaml
+mode: team
+team:
+  preset: "full-stack-app"
+```
+
+Agents are numbered 00-33 across layers: Meta/Agile, Governance, Architecture, Security, Implementation, QA, Operations. See `docs/team-presets.md` for preset configurations.
