@@ -1,4 +1,4 @@
-# USDAF — Team Presets
+# Archon — Team Presets
 
 > Project-specific agent team configurations. Used by Agent 00 (Orchestrator) during Phase 0 (Kickoff).
 
@@ -22,7 +22,7 @@ These agents are **mandatory for every project**, regardless of preset:
 |---|-------|-----|
 | 00 | Orchestrator | Coordinates all phases and agents |
 | 08 | Security Architect | Veto power, security-by-design is non-negotiable |
-| 27 | Spec Writer | Spec-driven development is the foundation of USDAF |
+| 27 | Spec Writer | Spec-driven development is the foundation of Archon |
 | 28 | Backlog Manager | Task lifecycle tracking is non-negotiable |
 
 ---
@@ -310,7 +310,7 @@ mandatory:
   - 12-domain-logic              # Core business logic, entities, use cases
   - 14-adapters                  # Infrastructure layer, DB access, external APIs
   - 17-test-architect            # Test strategy — keep quality even when moving fast
-  - 27-spec-writer               # Specs before code — the foundation of USDAF
+  - 27-spec-writer               # Specs before code — the foundation of Archon
 
 recommended:
   - 05-data-architect            # If data modeling beyond basic CRUD

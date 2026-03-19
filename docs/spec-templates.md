@@ -1,4 +1,4 @@
-# USDAF — Spec Templates
+# Archon — Spec Templates
 
 > Templates for all specification types produced by Agent 27 (Spec Writer) during Phase 1.
 

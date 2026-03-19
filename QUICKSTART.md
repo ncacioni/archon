@@ -1,99 +1,99 @@
-# Quick Start Guide — USDAF
+# Quick Start — Archon
 
-## Option A: Using the v2.0 Runtime (Recommended)
+## 1. Initialize
 
 ```bash
-# 1. Initialize USDAF in your project
 cd your-project
-npx usdaf init
-
-# 2. This creates:
-#    .usdaf/runtime/    — 6 runtime modules
-#    .usdaf/skills/     — 6 phase skill definitions
-#    .usdaf/toolkits/   — Agent tool indices + definitions
-#    .usdaf/config.yml  — Project configuration
-#    Updates CLAUDE.md and .gitignore
-
-# 3. Estimate token cost before starting
-node .usdaf/runtime/token-estimator.js estimate --complexity medium
-
-# 4. Start with Agent 00 (Orchestrator) — it will guide the rest
+npx archon init
 ```
 
-### v2.0 Runtime Commands
+This creates `.archon/` with runtime, config, skills, and toolkits. It also updates `CLAUDE.md` and `.gitignore`.
+
+## 2. Use with Claude Code
+
+Open Claude Code in your project. Describe what you need naturally:
+
+```
+"Add user authentication with JWT and role-based access"
+"Fix the login endpoint — it returns 500 on invalid passwords"
+"Review the payment module for security issues"
+"Create a migration to add an orders table"
+```
+
+Archon detects the intent and activates the right agents automatically.
+
+## 3. CLI Tools
 
 ```bash
-# Token estimation
-node .usdaf/runtime/token-estimator.js estimate --complexity simple
-node .usdaf/runtime/token-estimator.js estimate --complexity complex --agents 00,02,04,08,12,15,17
+# See what Archon detects from your message
+node .archon/runtime/intent-router.js detect "add user authentication"
 
-# Agent memory
-node .usdaf/runtime/memory-manager.js load 08-security-architect
-node .usdaf/runtime/memory-manager.js compact 08-security-architect
+# Track feature progress
+node .archon/runtime/project-state.js status
 
-# Toolkit inspection
-node .usdaf/runtime/toolkit-loader.js list 08-security-architect
-node .usdaf/runtime/toolkit-loader.js load stride-analysis
+# Check what's missing (security review, tests, etc.)
+node .archon/runtime/project-state.js pending
 
-# Scout cache
-node .usdaf/runtime/scout-service.js search jwt --cache-only
-node .usdaf/runtime/scout-service.js cache
+# Estimate token cost before starting
+node .archon/runtime/token-estimator.js estimate --complexity medium
 
-# Maintenance
-node .usdaf/runtime/maintenance.js audit
-node .usdaf/runtime/maintenance.js check
+# View active agents
+node .archon/runtime/agent-registry.js agents
+
+# Check agent memory
+node .archon/runtime/memory-manager.js load S4
+
+# Run maintenance audit
+node .archon/runtime/maintenance.js audit
 ```
 
-## Option B: Manual Agent Loading (Any LLM)
+## What Gets Activated When
 
-1. Pick a team preset from `docs/team-presets.md`
-2. Load the relevant agent prompts from `agents/`
-3. Append the certification context from `docs/agent-certification-map.md`
-4. Start with Phase 0 (Kickoff)
+| You say... | Archon activates |
+|-----------|-----------------|
+| "Add a new API endpoint" | Spec Writer → Security → Builder → QA |
+| "Fix the broken tests" | Builder → QA |
+| "Review auth for vulnerabilities" | Security → Architect |
+| "Deploy to staging" | DevOps |
+| "Design the database schema" | Architect → Spec Writer |
+| "Add a React dashboard" | Frontend → QA |
+| "Create a data migration" | Data → Security |
 
-### Agent Quick Reference
+## Configuration
 
-| I need to... | Use Agent |
-|---|---|
-| Define what to build | 02-Requirements Architect |
-| Design the database/domain model | 05-Data Architect |
-| Design APIs | 06-Integration Architect |
-| Set up auth/permissions | 09-IAM Agent |
-| Write business logic | 12-Domain Logic Agent |
-| Build the frontend | 15-Frontend Architect + 16-UI Builder |
-| Write tests | 17-Test Architect + 18-Test Implementation |
-| Review code for security | 08-Security Architect + 20-SAST Agent |
-| Set up CI/CD | 21-CI/CD Agent |
+Edit `.archon/config.yml`:
 
-## Option C: Security Review Only
+```yaml
+# Switch between modes
+mode: solo          # solo (9 agents) | team (34 agents)
 
-For existing code, use agents 08 + 11 + 19 + 20 in sequence:
-1. Security Architect — threat model your system
-2. Threat Intelligence — find attack surfaces
-3. Code Review — check architecture compliance
-4. SAST — scan for OWASP Top 10
+# Solo mode agents
+solo:
+  agents: [S0, S1, S2, S3, S4, S5, S6, S7, S8]
 
-## Tips for Best Results
-
-1. **Start with requirements** — Even for fast projects, 5 minutes on requirements saves hours of rework
-2. **Always include the Security agent** — Auth is where most projects get compromised
-3. **Use the Security Architect early** — Designing security in is cheaper than bolting it on
-4. **Feed artifacts forward** — Each agent's output is the next agent's input
-5. **Don't skip gates** — If a gate fails, fix it before moving on
-6. **Check memory** — Agent learnings from past sessions prevent repeating mistakes
-
-## Example Prompt to Start
-
-```
-I want to build a task management API with:
-- User registration and login
-- Teams with multiple users
-- Tasks assigned to users within teams
-- Role-based access (admin, member, viewer)
-- REST API with PostgreSQL
-- Docker deployment
-
-Use USDAF phases 0-7 and start with Phase 0 (Kickoff).
+# Team mode preset
+team:
+  preset: "full-stack-app"
 ```
 
-The Orchestrator will invoke each agent in order, building the complete system.
+## Solo Agents
+
+| ID | Agent | Role |
+|----|-------|------|
+| S0 | Archon | Orchestration and routing |
+| S1 | Architect | Solution design, C4, API contracts |
+| S2 | Security | STRIDE, veto power |
+| S3 | Spec Writer | OpenAPI, DB schemas, wireframes |
+| S4 | Builder | Domain logic, services, adapters |
+| S5 | Frontend | Components, UI, UX |
+| S6 | QA | Tests, code review, SAST |
+| S7 | DevOps | CI/CD, observability, releases, docs |
+| S8 | Data | Data modeling, pipelines, migrations |
+
+## Tips
+
+1. **Just describe what you need** — No need to pick agents or phases manually
+2. **Security always reviews** — Implementation work gets S2 review automatically
+3. **Specs come first** — For new features, Archon generates specs before code (quick fixes skip this)
+4. **Memory carries forward** — Agent learnings persist across sessions
+5. **Check pending reviews** — `project-state.js pending` shows what still needs security review or tests

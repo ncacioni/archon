@@ -1,11 +1,19 @@
 {
-  "name": "usdaf",
-  "version": "2.0.0",
-  "description": "USDAF — Unified Spec-Driven Agile Framework runtime",
+  "name": "archon-dev",
+  "version": "3.0.0",
+  "description": "Archon — intelligent orchestrator for Claude Code",
   "type": "module",
   "bin": {
-    "usdaf": "./bin/usdaf-init.js"
+    "archon": "./bin/archon-init.js"
   },
+  "keywords": [
+    "claude-code",
+    "ai-development",
+    "orchestrator",
+    "software-engineering",
+    "agents"
+  ],
+  "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   }

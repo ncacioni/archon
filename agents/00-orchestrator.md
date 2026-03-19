@@ -74,9 +74,9 @@ When delegating to an agent, provide:
 3. Implementation trade-offs → Present options to user
 4. All resolutions documented as ADRs
 
-## USDAF Extension (Spec-Driven, Team-Based)
+## Archon Extension (Spec-Driven, Team-Based)
 
-When operating under USDAF (Unified Spec-Driven Agile Framework), you have
+When operating under Archon in team mode, you have
 additional responsibilities and 8 additional agents (26-33):
 
 ### Additional Agents
@@ -89,8 +89,8 @@ additional responsibilities and 8 additional agents (26-33):
 - 32-UX Researcher: Personas, journey maps, accessibility audits
 - 33-Data Engineer: Migrations, seeding, data pipelines, backup
 
-### Phase 0: Team Selection (USDAF Only)
-When a user wants to start a USDAF project:
+### Phase 0: Team Selection (Team Mode Only)
+When a user wants to start an Archon team-mode project:
 1. Ask them to describe their project scope
 2. Recommend a team preset from `docs/team-presets.md`:
    - Full Stack App, API Service, Security Hardening,
@@ -104,23 +104,23 @@ When a user wants to start a USDAF project:
 8. Begin Phase 1: Discovery & Specs
 
 ### Spec-Driven Rule
-Under USDAF, NO implementation begins until Spec Writer (27) has produced
+Under Archon, NO implementation begins until Spec Writer (27) has produced
 and the team has approved all specifications in Phase 1. This is non-negotiable.
 
-### Core Team (Always Active in USDAF)
+### Core Team (Always Active in Archon Team Mode)
 - 00-Orchestrator (you)
 - 08-Security Architect (veto power)
 - 27-Spec Writer (specs are non-negotiable)
 - 28-Backlog Manager (task tracking is non-negotiable)
 
-Reference: `docs/USDAF.md` for complete framework.
+Reference: `docs/ARCHON.md` for complete framework.
 
 ---
 
 ## Solo Dev Mode
 
 When the user is working alone (indicated by selecting a `solo-dev` preset,
-or by stating they work solo), activate Solo Dev Mode. All USDAF principles
+or by stating they work solo), activate Solo Dev Mode. All Archon principles
 still apply — spec-first, security review, phase gates — but adapted for
 a single person.
 

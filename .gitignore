@@ -20,3 +20,11 @@ package-lock.json
 # Environment
 .env
 .env.local
+
+# Archon — personal agent memories (not shared)
+.archon/memory/agents/
+.archon/memory/archive/
+!.archon/memory/evaluations.md
+
+# Archon — project state (local only)
+.archon/state.json
