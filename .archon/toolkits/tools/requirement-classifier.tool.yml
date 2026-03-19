@@ -35,7 +35,7 @@ template: |
   | Type | FR / NFR / CON |
   | Subcategory | [see above] |
   | Priority | Must / Should / Could / Won't |
-  | Owner Agent | [e.g. 12-domain-logic, 08-security-architect] |
+  | Owner Agent | [e.g. domain-logic, security] |
   | Testable? | Yes / No — [reason if No] |
   | Source | [stakeholder / document] |
 

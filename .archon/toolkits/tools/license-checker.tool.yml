@@ -1,6 +1,6 @@
 id: license-checker
 description: "Verify package license compatibility with project requirements"
-when_to_use: "Before approving any new dependency — mandatory check in agent 25 scouting workflow"
+when_to_use: "Before approving any new dependency — mandatory check in architect agent scouting workflow"
 input:
   - name: package_name
     type: string

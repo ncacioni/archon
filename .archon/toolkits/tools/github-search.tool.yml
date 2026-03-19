@@ -1,6 +1,6 @@
 id: github-search
 description: "Search GitHub repos for libraries and solutions"
-when_to_use: "When looking for open source solutions, reference implementations, or inspiration (agent 25)"
+when_to_use: "When looking for open source solutions, reference implementations, or inspiration (architect agent)"
 input:
   - name: search_query
     type: string

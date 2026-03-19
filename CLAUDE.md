@@ -1,121 +1,102 @@
-# CLAUDE.md
+# Archon
 
-## This project uses Archon
+Archon is a scalable agent orchestration framework for Claude Code. It uses Claude Code's native `.claude/` system — agents with frontmatter, skills, commands, and scratchpad — to provide deterministic, multi-agent workflows with proper model tiering and tool scoping.
 
-Archon is an intelligent orchestrator for Claude Code. It auto-detects what you need and activates the right agents.
+## Modes
 
-## Active Mode: Solo
+- **Solo** (9 agents) — for individual developers or small projects. Each agent covers a broad domain.
+- **Team** (21 agents) — for larger projects with multiple domains. Solo agents decompose into specialists.
 
-9 consolidated agents — read their prompts from `agents/solo/`:
+The mode is set in `.archon/config.yml` (`mode: solo` or `mode: team`). Commands and natural language work identically in both modes — the orchestrator expands solo agent names to team specialists when in team mode. See the mapping table below.
 
-| ID | Agent | Role |
-|----|-------|------|
-| S0 | Archon | Orchestration and routing |
-| S1 | Architect | Solution design, C4, API contracts |
-| S2 | Security | Security review (STRIDE, veto power) |
-| S3 | Spec Writer | OpenAPI, DB schemas, wireframes |
-| S4 | Builder | Domain logic, app services, adapters |
-| S5 | Frontend | Components, UI, UX |
-| S6 | QA | Tests, code review, SAST |
-| S7 | DevOps | CI/CD, observability, releases, docs |
-| S8 | Data | Data modeling, pipelines, migrations |
+## Available Agents
 
-## How to work
+| Agent | Model | Role |
+|-------|-------|------|
+| architect | opus | Solution design, ADD, C4, API contracts, technology selection |
+| security | opus | Security review (STRIDE, OWASP), veto power on critical issues |
+| spec-writer | sonnet | OpenAPI, DB schemas, domain models, wireframes, state machines |
+| builder | opus | Domain logic, app services, adapters (Clean Architecture, TDD) |
+| frontend | sonnet | Components, UI/UX, accessibility (WCAG 2.1 AA), performance |
+| qa | sonnet | Tests, code review, SAST, architecture compliance |
+| devops | sonnet | CI/CD, observability, releases, documentation |
+| data | sonnet | Data modeling, pipelines, migrations, warehouse patterns |
+| ml-engineer | opus | ML systems: feature engineering, modeling, evaluation, MLOps |
+
+## Commands
+
+Use these for structured workflows:
+
+| Command | Description | Agents |
+|---------|-------------|--------|
+| `/build` | Full build pipeline (classify → analyze → design → spec → security → implement → QA → docs) | All (by size) |
+| `/review` | Code review + security audit | qa → security |
+| `/fix` | Bug analysis, fix, regression test | builder → qa |
+| `/secure` | Focused security audit (STRIDE + OWASP) | security (→ architect) |
+| `/test` | Test writing and execution | qa |
+| `/deploy` | CI/CD, Docker, releases | devops |
+| `/design` | Architecture (ADD) + specifications | architect → spec-writer → security |
+| `/ml` | ML workflow: problem framing → data → features → model → deploy | ml-engineer → security → qa |
+| `/data` | Data infrastructure: modeling → schema → migrations → pipelines → quality | data → security → qa |
+| `/refactor` | Code refactoring with behavioral preservation | architect → builder → qa |
+
+## Core Invariants
+
+1. **Security before shipping.** Security agent always reviews before implementation ships. Security has **veto power** — hardcoded secrets, injection, auth bypass, deprecated crypto are non-negotiable blockers.
+2. **ADD before code for L/XL features.** Architectural Design Document required for large features. Specs (OpenAPI, DB schema) required for M+. Inline OK for fixes and S tasks.
+3. **Clean Architecture.** Dependencies point inward: Domain → Application → Adapters. Domain layer has zero external dependencies.
+4. **No ceremony.** Don't announce phases, don't ask which agents to use, don't reference agent IDs. Just work. Integrate outputs cohesively.
+5. **Specs define contracts, not implementations.** Specs come before code. Implementation decides HOW.
+
+## How to Work
 
 When the user asks you to do something:
 
-1. Read `.archon/config.yml` for project context and mode (solo/team)
-2. Determine the intent of the request (build, review, fix, secure, test, deploy, design, data, document, frontend)
-3. For each activated agent, read its prompt from `agents/solo/` (solo mode) or `agents/` (team mode)
-4. Security (S2) **always** reviews implementation work before shipping
-5. Specs precede code — but for quick fixes, inline spec is fine
+1. Determine the intent (build, review, fix, secure, test, deploy, design, data, ml, refactor, frontend)
+2. Use the matching command pipeline, or dispatch agents directly for simple tasks
+3. For ambiguous requests, infer intent from context — do not ask the user to classify
+4. Combine passes when scope is small (a trivial fix doesn't need 8 phases)
+5. For critical security issues, be direct and firm — flag as blockers that must be fixed
+6. When trade-offs exist, present 2-3 options with pros/cons and a recommendation
 
-### Intent → Agent mapping
-
-| Intent | Agents activated |
-|--------|-----------------|
-| BUILD (add, create, implement) | S3 → S2 → S4 → S6 |
-| REVIEW (review, check, audit) | S6 → S2 |
-| FIX (fix, bug, error, debug) | S4 → S6 |
-| SECURE (security, auth, permissions) | S2 → S1 |
-| TEST (test, coverage, e2e) | S6 |
-| DEPLOY (deploy, release, ci/cd) | S7 |
-| DESIGN (architecture, design, schema) | S1 → S3 |
-| DATA (migration, pipeline, etl, database) | S8 → S2 |
-| DOCUMENT (document, readme, docs) | S7 |
-| FRONTEND (frontend, ui, component, react) | S5 → S6 |
-
-## Core invariants
-
-1. Security phase always runs **before** implementation ships
-2. S2 (Security) has **veto power** at any point
-3. No code is written until specs are approved (inline OK for quick fixes)
-4. Clean Architecture: dependencies point inward — Domain < App < Infrastructure < UI
-5. Domain layer has zero external dependencies
-
-## Repository structure
+## Repository Structure
 
 ```
-agents/
-  solo/            9 consolidated agents (S0-S8) for solo mode
-  *.md             34 original agents (00-33) for team mode
-docs/              Framework documentation and guides
-bin/               CLI entry point (npx archon init)
+.claude/
+  agents/solo/       9 agents with frontmatter (model, tools, skills)
+  agents/team/       21 agents for team mode
+  skills/            11 reusable domain knowledge skills
+  commands/          10 deterministic workflow entry points
+  scratchpad/        Inter-agent state (gitignored, ephemeral)
+  settings.json      Claude Code settings
+docs/                Framework documentation and guides
+bin/                 CLI entry point (npx archon init)
 .archon/
-  runtime/         8 modules: memory-manager, toolkit-loader, token-estimator,
-  |                scout-service, agent-registry, maintenance, intent-router, project-state
-  |__ __tests__/   Test suite (Node.js built-in test runner)
-  skills/          6 phase skill definitions
-  toolkits/        Agent toolkit indices + tool definitions (YAML)
-  memory/          Persistent agent memory (auto-managed, gitignored)
-  config.yml       Project configuration (mode: solo | team)
+  runtime/           Runtime modules (project-state, scout-service, toolkit-loader, maintenance, integrity)
+  toolkits/          Agent toolkit indices + tool definitions (YAML)
+  config.yml         Project configuration (mode: solo | team)
 ```
 
 ## Runtime
 
 The runtime lives in `.archon/runtime/` — Node.js ES modules, `js-yaml` as only dependency.
 
-### Running tests
-
 ```bash
 cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-### Key modules
+### Key Modules
 
 | Module | Purpose |
 |--------|---------|
-| `intent-router.js` | Detect intent from user message, map to agent activation order |
 | `project-state.js` | Track feature progress (spec → security → implementation → tests → review) |
-| `agent-registry.js` | Load agents (solo or team mode), build dispatch prompts |
-| `memory-manager.js` | Persistent agent memory with graduation rules |
-| `token-estimator.js` | Token cost estimation per task |
 | `scout-service.js` | OSS package evaluation cache |
 | `toolkit-loader.js` | Two-level YAML toolkit loading |
 | `maintenance.js` | Toolkit integrity + vulnerability auditing |
+| `integrity.js` | Agent/skill/command cross-reference validation |
 
-### CLI examples
-
-```bash
-# Detect intent
-node .archon/runtime/intent-router.js detect "add user authentication"
-
-# Check active agents for current mode
-node .archon/runtime/agent-registry.js agents
-
-# Feature tracking
-node .archon/runtime/project-state.js status
-node .archon/runtime/project-state.js pending
-
-# Token estimation
-node .archon/runtime/token-estimator.js estimate --complexity medium
-
-# Agent memory
-node .archon/runtime/memory-manager.js load S4
-```
-
-## Team mode (34 agents)
+## Team Mode (21 agents)
 
 Switch to team mode in `.archon/config.yml`:
 
@@ -125,4 +106,31 @@ team:
   preset: "full-stack-app"
 ```
 
-Agents are numbered 00-33 across layers: Meta/Agile, Governance, Architecture, Security, Implementation, QA, Operations. See `docs/team-presets.md` for preset configurations.
+Team agents are specialized versions of solo agents. Same frontmatter schema, same skills, same commands. See `docs/team-presets.md` for preset configurations.
+
+### Solo → Team Agent Mapping
+
+When in team mode, commands reference solo agent names which expand to team specialists:
+
+| Command references | Solo resolves to | Team resolves to |
+|-------------------|-----------------|-----------------|
+| builder | builder | domain-logic → app-services → adapter-layer (sequential) |
+| qa | qa | test-engineer + code-reviewer (parallel) |
+| frontend | frontend | ui-engineer (+ ux-researcher for L/XL) |
+| data | data | data-modeler → pipeline-engineer → warehouse-engineer (sequential) |
+| devops | devops | ci-cd-engineer + observability-engineer + release-manager |
+| architect | architect | architect (same) |
+| security | security | security (same) |
+| spec-writer | spec-writer | spec-writer (same) |
+| ml-engineer | ml-engineer | ml-engineer (same) |
+
+### Presets
+
+| Preset | Agents | Use case |
+|--------|--------|----------|
+| full-stack-app | 18 | Web/mobile app with API, DB, frontend |
+| api-service | 11 | Backend API or microservice |
+| data-platform | 11 | Data warehouse, ETL/ELT, analytics |
+| ml-platform | 10 | ML training, serving, monitoring |
+| frontend-app | 10 | SPA, mobile, UI-heavy |
+| minimum-viable | 6 | Quick prototype or MVP |

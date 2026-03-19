@@ -1,6 +1,6 @@
 id: component-inventory
 description: "Inventory of UI components with props, variants, and dependencies"
-when_to_use: "When auditing existing UI components or planning a new design system (agent 15)"
+when_to_use: "When auditing existing UI components or planning a new design system (frontend agent)"
 input:
   - name: component_name
     type: string

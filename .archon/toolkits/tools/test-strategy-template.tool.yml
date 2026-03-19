@@ -1,6 +1,6 @@
 id: test-strategy-template
 description: "Test strategy template with scope, tools, and risk assessment"
-when_to_use: "At the start of any new feature or project to define the testing approach (agent 17, Phase 0/1)"
+when_to_use: "At the start of any new feature or project to define the testing approach (qa agent, Phase 0/1)"
 input:
   - name: project_name
     type: string
@@ -64,4 +64,4 @@ template: |
     "ciIntegration": "[github-actions|gitlab-ci]"
   }
   ```
-output: "test-strategy-[project].md — reviewed and signed off by agent 17"
+output: "test-strategy-[project].md — reviewed and signed off by qa agent"

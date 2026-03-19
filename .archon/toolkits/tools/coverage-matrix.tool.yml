@@ -1,6 +1,6 @@
 id: coverage-matrix
 description: "Test coverage matrix mapping requirements to test cases"
-when_to_use: "During test strategy review (agent 17) to ensure all requirements have test coverage"
+when_to_use: "During test strategy review (qa agent) to ensure all requirements have test coverage"
 input:
   - name: feature_name
     type: string

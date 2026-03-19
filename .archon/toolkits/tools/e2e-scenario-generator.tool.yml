@@ -1,6 +1,6 @@
 id: e2e-scenario-generator
 description: "Generate E2E test scenarios from user stories"
-when_to_use: "When translating accepted user stories into Playwright/Cypress E2E test scenarios (agent 17/18)"
+when_to_use: "When translating accepted user stories into Playwright/Cypress E2E test scenarios (qa agent)"
 input:
   - name: user_story
     type: string

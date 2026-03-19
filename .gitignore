@@ -28,3 +28,6 @@ package-lock.json
 
 # Archon — project state (local only)
 .archon/state.json
+
+# Claude Code — inter-agent scratchpad (ephemeral)
+.claude/scratchpad/

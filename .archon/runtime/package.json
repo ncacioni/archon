@@ -2,7 +2,7 @@
   "name": "archon-runtime",
   "version": "3.0.0",
   "type": "module",
-  "description": "Archon v3.0 runtime — memory, toolkits, scout, estimation, intent routing",
+  "description": "Archon runtime — project state, scout, toolkits, maintenance",
   "dependencies": {
     "js-yaml": "^4.1.0"
   }

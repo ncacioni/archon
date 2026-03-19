@@ -115,7 +115,7 @@ if (_argv1mt.replace(/\\/g, '/') === _metaUrlMt.replace(/\\/g, '/')) {
       let config = {};
       if (fs.existsSync(configPath)) {
         const { default: yamlLib } = await import('js-yaml');
-        config = yamlLib.load(fs.readFileSync(configPath, 'utf-8'));
+        config = yamlLib.load(fs.readFileSync(configPath, 'utf-8'), { schema: yamlLib.DEFAULT_SCHEMA });
       }
       console.log(shouldRun(config) ? 'AUDIT_NEEDED' : 'OK');
     }
