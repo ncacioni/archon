@@ -50,6 +50,14 @@ Update relevant docs:
 
 Write to `.claude/scratchpad/implementation-log.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Report current deployment state assessment (what exists, what's missing, what needs change)
+- **Phase 2**: Report what was implemented (pipeline stages, Docker config, release artifacts, infra changes)
+- **Phase 3**: Report documentation updates (runbooks created, README changes, env config)
+
 ## Rules
 
 - All secrets from vault at runtime — never in code or env files

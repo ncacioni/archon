@@ -54,6 +54,14 @@ Consolidate all findings with:
 - **LOW** (fix within 90 days)
 - Concrete fix suggestions with code examples for each finding
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Report audit findings (STRIDE results per component, OWASP checks, veto triggers found, dependency CVEs)
+- **Phase 2**: Report architecture-level security concerns (if triggered)
+- **Phase 3**: Present the full remediation plan — this IS the final output to the user
+
 ## Rules
 
 - Veto triggers are non-negotiable blockers

@@ -46,6 +46,14 @@ Spawn the **security** agent to review the ADD and specs:
 
 Write to `.claude/scratchpad/security-review.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 1**: Present ADD summary (problem, options considered, recommended decision, key architecture views)
+- **Phase 2**: Report specs produced (which artifacts, key contracts, notable decisions)
+- **Phase 3**: Report security review results (blockers, advisories, revisions needed)
+
 ## Rules
 
 - ADD is the primary artifact — it captures the WHY, not just the WHAT

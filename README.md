@@ -111,7 +111,7 @@ node --test __tests__/*.test.js
 2. **ADD before code for L/XL features** — Architectural Design Document required for large features. Specs for M+. Inline OK for fixes.
 3. **Clean Architecture** — Dependencies point inward: Domain → Application → Adapters. Domain has zero external deps.
 4. **Deterministic pipelines** — Commands define exact agent sequences. No more skipped steps.
-5. **No ceremony** — No phase announcements, no gate approvals. Just work.
+5. **Progress over ceremony** — Concise status updates after each phase. No gate approvals, no agent labels.
 
 ## Repository Structure
 

@@ -88,11 +88,25 @@ Write to `.claude/scratchpad/qa-review.md`.
 
 Spawn the **devops** agent. Produce PR summary, update relevant docs, changelog entry if needed. Write to `.claude/scratchpad/pr-summary.md`.
 
+## Progress Reporting
+
+After each phase completes, report a concise status update to the user:
+
+- **Phase 0**: Report classification (size, affected areas, agents selected, phases that will run)
+- **Phase 1**: Summarize key findings from analysis (patterns found, integration points, risks identified)
+- **Phase 2**: Present ADD summary with options/trade-offs for user decision (L/XL only)
+- **Phase 3**: Report spec artifacts produced (which specs, key contracts defined)
+- **Phase 4**: Report security findings — blockers halt the pipeline, advisories are listed
+- **Phase 5**: Report what was implemented (files created/modified, key decisions made)
+- **Phase 6**: Report QA results (tests passed/failed, coverage, issues found). If looping back, explain why
+- **Phase 7**: Report final summary (PR description, docs updated, changelog)
+
+Keep updates concise (3-5 lines per phase). Focus on decisions made, issues found, and artifacts produced — not process narration.
+
 ## Rules
 
-- Do NOT announce phases to the user — just work
 - Do NOT ask which agents to use — determine from classification
-- Integrate outputs cohesively — no "[As architect]" labels
+- Integrate outputs cohesively — no "[As architect]" labels in output
 - Security veto is non-negotiable — blocked means blocked
 - For XL tasks, warn the user and offer to split before proceeding
 - Combine phases when scope is small (S tasks can be one pass)
