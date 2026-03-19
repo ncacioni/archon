@@ -1,6 +1,6 @@
 id: package-evaluator
 description: "Evaluate package health: downloads, maintenance, security, license"
-when_to_use: "Final evaluation gate before recommending a package for adoption (agent 25 final step)"
+when_to_use: "Final evaluation gate before recommending a package for adoption (architect agent final step)"
 input:
   - name: package_name
     type: string

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Archon v3.0 CLI
- * Usage: npx archon init [--name <name>] [--mode <solo|team>]
+ * Archon CLI
+ * Usage: npx archon init
  */
 
 import fs from 'node:fs';
@@ -12,81 +12,104 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CWD = process.cwd();
 const ARCHON_DIR = path.join(CWD, '.archon');
+const CLAUDE_DIR = path.join(CWD, '.claude');
 
 const PKG_ROOT = path.resolve(__dirname, '..');
 const SRC_RUNTIME = path.join(PKG_ROOT, '.archon', 'runtime');
 const SRC_TOOLKITS = path.join(PKG_ROOT, '.archon', 'toolkits');
-const SRC_SKILLS = path.join(PKG_ROOT, '.archon', 'skills');
 const SRC_CONFIG = path.join(PKG_ROOT, '.archon', 'config.yml');
 
-function main() {
-  console.log('Archon v3.0 — Initializing...\n');
+const SRC_AGENTS_SOLO = path.join(PKG_ROOT, '.claude', 'agents', 'solo');
+const SRC_AGENTS_TEAM = path.join(PKG_ROOT, '.claude', 'agents', 'team');
+const SRC_SKILLS = path.join(PKG_ROOT, '.claude', 'skills');
+const SRC_COMMANDS = path.join(PKG_ROOT, '.claude', 'commands');
 
-  // 1. Create directory structure
-  const dirs = [
+function main() {
+  console.log('Archon — Initializing...\n');
+
+  // 1. Create .archon directory structure
+  const archonDirs = [
     '.archon/runtime', '.archon/runtime/__tests__',
-    '.archon/toolkits/tools', '.archon/skills',
-    '.archon/memory/agents', '.archon/memory/archive',
+    '.archon/toolkits/tools',
   ];
-  for (const dir of dirs) {
+  for (const dir of archonDirs) {
     const full = path.join(CWD, dir);
     fs.mkdirSync(full, { recursive: true });
     console.log(`  Created: ${dir}/`);
   }
 
-  // 2. Copy runtime files
+  // 2. Create .claude directory structure
+  const claudeDirs = [
+    '.claude/agents/solo', '.claude/agents/team',
+    '.claude/skills', '.claude/commands',
+    '.claude/scratchpad',
+  ];
+  for (const dir of claudeDirs) {
+    const full = path.join(CWD, dir);
+    fs.mkdirSync(full, { recursive: true });
+    console.log(`  Created: ${dir}/`);
+  }
+
+  // 3. Copy runtime files
   if (fs.existsSync(SRC_RUNTIME)) {
     copyDir(SRC_RUNTIME, path.join(ARCHON_DIR, 'runtime'));
     console.log('  Copied: runtime modules');
   }
 
-  // 3. Copy toolkits
+  // 4. Copy toolkits
   if (fs.existsSync(SRC_TOOLKITS)) {
     copyDir(SRC_TOOLKITS, path.join(ARCHON_DIR, 'toolkits'));
     console.log('  Copied: toolkit definitions');
   }
 
-  // 4. Copy skills
-  if (fs.existsSync(SRC_SKILLS)) {
-    copyDir(SRC_SKILLS, path.join(ARCHON_DIR, 'skills'));
-    console.log('  Copied: phase skills');
-  }
-
   // 5. Copy default config
   if (fs.existsSync(SRC_CONFIG)) {
     fs.copyFileSync(SRC_CONFIG, path.join(ARCHON_DIR, 'config.yml'));
-    console.log('  Created: config.yml');
+    console.log('  Created: .archon/config.yml');
   }
 
-  // 6. Create .gitkeep files for empty directories
-  for (const dir of ['memory/agents', 'memory/archive']) {
-    const gitkeep = path.join(ARCHON_DIR, dir, '.gitkeep');
-    if (!fs.existsSync(gitkeep)) {
-      fs.writeFileSync(gitkeep, '', 'utf-8');
-    }
-  }
-  console.log('  Created: .gitkeep files for empty dirs');
-
-  // 7. Create empty evaluations.md
-  const evalFile = path.join(ARCHON_DIR, 'memory', 'evaluations.md');
-  if (!fs.existsSync(evalFile)) {
-    fs.writeFileSync(evalFile, '# Archon Evaluation Cache\n\n', 'utf-8');
-    console.log('  Created: memory/evaluations.md');
+  // 6. Copy .claude agents (solo)
+  if (fs.existsSync(SRC_AGENTS_SOLO)) {
+    copyDir(SRC_AGENTS_SOLO, path.join(CLAUDE_DIR, 'agents', 'solo'));
+    console.log('  Copied: solo agents (9)');
   }
 
-  // 8. Update .gitignore
+  // 7. Copy .claude agents (team)
+  if (fs.existsSync(SRC_AGENTS_TEAM)) {
+    copyDir(SRC_AGENTS_TEAM, path.join(CLAUDE_DIR, 'agents', 'team'));
+    console.log('  Copied: team agent scaffolding');
+  }
+
+  // 8. Copy .claude skills
+  if (fs.existsSync(SRC_SKILLS)) {
+    copyDir(SRC_SKILLS, path.join(CLAUDE_DIR, 'skills'));
+    console.log('  Copied: skills (11)');
+  }
+
+  // 9. Copy .claude commands
+  if (fs.existsSync(SRC_COMMANDS)) {
+    copyDir(SRC_COMMANDS, path.join(CLAUDE_DIR, 'commands'));
+    console.log('  Copied: commands (10)');
+  }
+
+  // 10. Update .gitignore
   updateGitignore(CWD);
 
-  // 9. Inject CLAUDE.md section
+  // 11. Inject CLAUDE.md section
   injectClaudeMd(CWD);
 
-  console.log('\nArchon v3.0 initialized successfully!');
-  console.log('Edit .archon/config.yml to configure your project.\n');
+  console.log('\nArchon initialized successfully!');
+  console.log('Edit .archon/config.yml to configure your project.');
+  console.log('Use /build, /fix, /review, /design, /ml, etc. in Claude Code.\n');
 }
 
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) {
+      console.warn(`  Skipping symlink: ${entry.name}`);
+      continue;
+    }
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
@@ -100,19 +123,20 @@ function copyDir(src, dest) {
 function updateGitignore(cwd) {
   const gitignorePath = path.join(cwd, '.gitignore');
   const entries = [
-    '# Archon — personal agent memories (not shared)',
+    '# Archon — local only (not shared)',
+    '.archon/state.json',
     '.archon/memory/agents/',
     '.archon/memory/archive/',
-    '# Keep evaluations.md (project knowledge)',
-    '!.archon/memory/evaluations.md',
-    '# Archon — project state (local only)',
-    '.archon/state.json',
+    '',
+    '# Claude Code — local only (not shared)',
+    '.claude/scratchpad/',
+    '.claude/settings.local.json',
   ];
   let content = '';
   if (fs.existsSync(gitignorePath)) {
     content = fs.readFileSync(gitignorePath, 'utf-8');
   }
-  if (content.includes('.archon/memory/agents/')) {
+  if (content.includes('.claude/scratchpad/')) {
     console.log('  .gitignore: already configured');
     return;
   }
@@ -126,31 +150,27 @@ function injectClaudeMd(cwd) {
   const section = `
 ## This project uses Archon
 
-Archon is an intelligent orchestrator for Claude Code.
+Archon is an intelligent orchestrator for Claude Code using native \`.claude/\` agents, skills, and commands.
 
 ### How to work
-When the user asks you to do something:
-1. Read \`.archon/config.yml\` for project context and mode (solo/team)
-2. Determine the intent of the request (build, review, fix, secure, test, deploy, design, data, document)
-3. For each activated agent, read its prompt from \`agents/solo/\` (solo mode) or \`agents/\` (team mode)
-4. Security (S2) always reviews implementation work before shipping
-5. Specs precede code — but for quick fixes, inline spec is fine
+Use slash commands for structured workflows:
+- \`/build\` — Full pipeline: classify → analyze → design → spec → security → implement → QA → docs
+- \`/fix\` — Bug analysis, fix, regression test
+- \`/review\` — Code review + security audit
+- \`/secure\` — Focused security audit (STRIDE + OWASP)
+- \`/test\` — Test writing and execution
+- \`/deploy\` — CI/CD, Docker, releases
+- \`/design\` — Architecture (ADD) + specifications
+- \`/ml\` — ML workflow: problem framing → model → deploy
+- \`/data\` — Data infrastructure: modeling → pipelines → quality
+- \`/refactor\` — Code refactoring with behavioral preservation
 
-### Agent prompts (Solo mode)
-- \`agents/solo/S0-archon.md\` — Orchestration and routing
-- \`agents/solo/S1-architect.md\` — Solution design, API contracts
-- \`agents/solo/S2-security.md\` — Security review (STRIDE, veto power)
-- \`agents/solo/S3-spec-writer.md\` — OpenAPI, DB schemas, wireframes
-- \`agents/solo/S4-builder.md\` — Domain logic, app services, adapters
-- \`agents/solo/S5-frontend.md\` — Components, UI, UX
-- \`agents/solo/S6-qa.md\` — Tests, code review, SAST
-- \`agents/solo/S7-devops.md\` — CI/CD, observability, releases
-- \`agents/solo/S8-data.md\` — Data modeling, pipelines, migrations
+Or describe what you need naturally — Archon detects intent and dispatches agents.
 
-### Runtime
-- Token estimator: \`node .archon/runtime/token-estimator.js estimate --complexity medium\`
-- Memory: \`node .archon/runtime/memory-manager.js load {agent-id}\`
-- Agent registry: \`node .archon/runtime/agent-registry.js prompt {agent-id} "{task}"\`
+### Core invariants
+1. Security reviews before shipping; security agent has veto power
+2. ADD before code for L/XL features; specs for M+; inline OK for fixes
+3. Clean Architecture: deps point inward; domain layer zero external deps
 `;
 
   if (!fs.existsSync(claudeMdPath)) {
@@ -174,7 +194,7 @@ if (process.argv[1] && import.meta.url === `file:///${process.argv[1].replace(/\
   if (subcommand === 'init' || !subcommand) {
     main();
   } else {
-    console.error(`Unknown command: ${subcommand}\nUsage: npx archon init [--name <name>] [--mode <solo|team>]`);
+    console.error(`Unknown command: ${subcommand}\nUsage: npx archon init`);
     process.exit(1);
   }
 }

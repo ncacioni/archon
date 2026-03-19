@@ -27,8 +27,8 @@ export function loadTool(toolId) {
 export function listTools(agentId) {
   const indexContent = loadIndex(agentId);
   if (!indexContent) return [];
-  const parsed = yaml.load(indexContent);
-  if (!parsed || !parsed.tools) return [];
+  const parsed = yaml.load(indexContent, { schema: yaml.DEFAULT_SCHEMA });
+  if (!parsed || !Array.isArray(parsed.tools)) return [];
   return parsed.tools.map(t => ({ id: t.id, description: t.description }));
 }
 

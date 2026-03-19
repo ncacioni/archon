@@ -44,10 +44,11 @@ function saveState(state) {
  * Get or create a feature tracker.
  * @param {string} featureId - short slug, e.g. "user-auth"
  */
-export function getFeature(featureId) {
-  const state = loadState();
-  return state.features[featureId] || {
-    id: featureId,
+const VALID_PHASES = new Set(['spec', 'security_review', 'implementation', 'tests', 'review']);
+
+function createFeature(id) {
+  return {
+    id,
     created: new Date().toISOString(),
     spec: false,
     security_review: false,
@@ -57,6 +58,11 @@ export function getFeature(featureId) {
   };
 }
 
+export function getFeature(featureId) {
+  const state = loadState();
+  return state.features[featureId] || createFeature(featureId);
+}
+
 /**
  * Mark a phase as complete for a feature.
  * @param {string} featureId
@@ -64,17 +70,12 @@ export function getFeature(featureId) {
  * @param {string} [artifact] - optional artifact path or description
  */
 export function markComplete(featureId, phase, artifact) {
+  if (!VALID_PHASES.has(phase)) {
+    throw new Error(`Invalid phase "${phase}". Valid phases: ${[...VALID_PHASES].join(', ')}`);
+  }
   const state = loadState();
   if (!state.features[featureId]) {
-    state.features[featureId] = {
-      id: featureId,
-      created: new Date().toISOString(),
-      spec: false,
-      security_review: false,
-      implementation: false,
-      tests: false,
-      review: false,
-    };
+    state.features[featureId] = createFeature(featureId);
   }
   state.features[featureId][phase] = artifact || true;
   state.features[featureId].updated = new Date().toISOString();

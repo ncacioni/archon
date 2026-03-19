@@ -1,6 +1,6 @@
 id: npm-search
 description: "Search npm registry for packages matching requirements"
-when_to_use: "When scouting libraries for a new feature or evaluating build-vs-buy (agent 25)"
+when_to_use: "When scouting libraries for a new feature or evaluating build-vs-buy (architect agent)"
 input:
   - name: search_query
     type: string

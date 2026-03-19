@@ -1,6 +1,6 @@
 id: owasp-checklist
 description: "OWASP Top 10 verification checklist for code review"
-when_to_use: "During code review gate (agent 19) or security architect review (agent 08)"
+when_to_use: "During code review gate (qa agent) or security architect review (security agent)"
 input:
   - name: component_type
     type: string

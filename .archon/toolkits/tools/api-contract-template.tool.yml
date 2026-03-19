@@ -1,6 +1,6 @@
 id: api-contract-template
 description: "REST API contract template with standard patterns"
-when_to_use: "When designing a new REST API or endpoint group (Phase 1, agent 06)"
+when_to_use: "When designing a new REST API or endpoint group (Phase 1, architect agent)"
 input:
   - name: resource_name
     type: string

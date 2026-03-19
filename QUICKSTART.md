@@ -7,41 +7,31 @@ cd your-project
 npx archon init
 ```
 
-This creates `.archon/` with runtime, config, skills, and toolkits. It also updates `CLAUDE.md` and `.gitignore`.
+This creates `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). It also updates `CLAUDE.md` and `.gitignore`.
 
 ## 2. Use with Claude Code
 
-Open Claude Code in your project. Describe what you need naturally:
+Open Claude Code in your project. Use slash commands for structured workflows:
 
 ```
-"Add user authentication with JWT and role-based access"
-"Fix the login endpoint — it returns 500 on invalid passwords"
-"Review the payment module for security issues"
-"Create a migration to add an orders table"
+/build Add user authentication with JWT and role-based access
+/fix Login endpoint returns 500 on invalid passwords
+/review Payment module security audit
+/secure Full security audit of the auth system
+/test Write tests for the user service
+/deploy Set up CI/CD with GitHub Actions
+/design Database schema for orders system
+/ml Build a churn prediction model
 ```
 
-Archon detects the intent and activates the right agents automatically.
+Or describe what you need naturally — Archon detects the intent and dispatches the right agents.
 
 ## 3. CLI Tools
 
 ```bash
-# See what Archon detects from your message
-node .archon/runtime/intent-router.js detect "add user authentication"
-
 # Track feature progress
 node .archon/runtime/project-state.js status
-
-# Check what's missing (security review, tests, etc.)
 node .archon/runtime/project-state.js pending
-
-# Estimate token cost before starting
-node .archon/runtime/token-estimator.js estimate --complexity medium
-
-# View active agents
-node .archon/runtime/agent-registry.js agents
-
-# Check agent memory
-node .archon/runtime/memory-manager.js load S4
 
 # Run maintenance audit
 node .archon/runtime/maintenance.js audit
@@ -49,15 +39,32 @@ node .archon/runtime/maintenance.js audit
 
 ## What Gets Activated When
 
-| You say... | Archon activates |
-|-----------|-----------------|
-| "Add a new API endpoint" | Spec Writer → Security → Builder → QA |
-| "Fix the broken tests" | Builder → QA |
-| "Review auth for vulnerabilities" | Security → Architect |
-| "Deploy to staging" | DevOps |
-| "Design the database schema" | Architect → Spec Writer |
-| "Add a React dashboard" | Frontend → QA |
-| "Create a data migration" | Data → Security |
+| Command | Pipeline |
+|---------|----------|
+| `/build` | Classify → Analyze → Architecture (L/XL) → Spec (M+) → Security → Implement → QA → Docs |
+| `/fix` | Analyze → Fix → Regression Tests |
+| `/review` | Code Review (QA) → Security Audit |
+| `/secure` | STRIDE + OWASP + Veto Triggers → Remediation Plan |
+| `/test` | Strategy → Implementation → Execution |
+| `/deploy` | Assessment → CI/CD/Docker/IaC → Documentation |
+| `/design` | ADD (Architecture) → Specs → Security Review |
+| `/ml` | Problem Framing → Data → Features → Model → Security → MLOps → QA |
+| `/data` | Scope → Modeling → Schema/Migration → Pipeline → Security → Quality → QA |
+| `/refactor` | Analysis → Refactoring Plan → Incremental Implementation → Verification |
+
+## Solo Agents
+
+| Agent | Model | Role |
+|-------|-------|------|
+| architect | opus | Solution design, ADD, C4, API contracts |
+| security | opus | STRIDE, veto power, OWASP Top 10 |
+| builder | opus | Domain logic, services, adapters (Clean Architecture) |
+| ml-engineer | opus | ML systems: features, modeling, evaluation, MLOps |
+| spec-writer | sonnet | OpenAPI, DB schemas, wireframes |
+| frontend | sonnet | Components, UI/UX, accessibility |
+| qa | sonnet | Tests, code review, SAST |
+| devops | sonnet | CI/CD, observability, releases, docs |
+| data | sonnet | Data modeling, pipelines, migrations |
 
 ## Configuration
 
@@ -65,35 +72,87 @@ Edit `.archon/config.yml`:
 
 ```yaml
 # Switch between modes
-mode: solo          # solo (9 agents) | team (34 agents)
+mode: solo          # solo (9 agents) | team (21 agents)
 
-# Solo mode agents
+# Solo mode
 solo:
-  agents: [S0, S1, S2, S3, S4, S5, S6, S7, S8]
+  agents_dir: ".claude/agents/solo"
+  agents: [architect, security, spec-writer, builder, frontend, qa, devops, data, ml-engineer]
 
 # Team mode preset
 team:
+  agents_dir: ".claude/agents/team"
   preset: "full-stack-app"
 ```
 
-## Solo Agents
+## Three Ways to Work
 
-| ID | Agent | Role |
-|----|-------|------|
-| S0 | Archon | Orchestration and routing |
-| S1 | Architect | Solution design, C4, API contracts |
-| S2 | Security | STRIDE, veto power |
-| S3 | Spec Writer | OpenAPI, DB schemas, wireframes |
-| S4 | Builder | Domain logic, services, adapters |
-| S5 | Frontend | Components, UI, UX |
-| S6 | QA | Tests, code review, SAST |
-| S7 | DevOps | CI/CD, observability, releases, docs |
-| S8 | Data | Data modeling, pipelines, migrations |
+### Option A: Slash commands (deterministic pipelines)
+```
+/build Add user authentication with JWT
+/fix Login returns 500 on invalid passwords
+/review Security audit of payment module
+```
+Each command triggers a fixed pipeline of agents in sequence. See the table above.
+
+### Option B: Natural language
+```
+"I need to add JWT authentication to the backend"
+"The login endpoint is broken, returning 500"
+"Review the payment module for security issues"
+```
+Claude Code reads `CLAUDE.md` automatically, detects intent, and dispatches the same pipeline as the corresponding slash command.
+
+### Option C: Plan mode (for complex features)
+```
+/plan I want a notification system with WebSockets, message queue, and metrics dashboard
+```
+Claude analyzes the scope, proposes an architecture and agent sequence, and executes after you approve the plan. Use this for L/XL features where you want to review the approach before implementation starts.
+
+**When to use which:**
+- **Commands** — when you know exactly what workflow you need
+- **Natural language** — for everyday development (same result, less ceremony)
+- **Plan mode** — for complex features where you want to review the approach first
+
+## What Gets Committed vs Ignored
+
+After `npx archon init`, your `.gitignore` is updated automatically.
+
+**Committed (shared with team):**
+| Path | Purpose |
+|------|---------|
+| `.claude/agents/` | Agent definitions (frontmatter + instructions) |
+| `.claude/skills/` | Shared domain knowledge |
+| `.claude/commands/` | Slash command pipelines |
+| `.claude/settings.json` | Base permissions (conservative, deny list) |
+| `.archon/config.yml` | Project configuration (mode, presets) |
+| `.archon/runtime/` | Runtime modules |
+| `.archon/toolkits/` | Agent toolkits |
+| `CLAUDE.md` | Project instructions for Claude Code |
+
+**Gitignored (local only):**
+| Path | Purpose |
+|------|---------|
+| `.claude/scratchpad/` | Ephemeral inter-agent artifacts |
+| `.claude/settings.local.json` | Personal permission tier |
+| `.archon/state.json` | Local feature progress tracking |
+| `.archon/memory/agents/` | Agent decision memories |
+| `.archon/memory/archive/` | Archived agent data |
+
+## Permission Setup
+
+After init, configure your permission tier in `.claude/settings.local.json`. See [docs/permission-guide.md](docs/permission-guide.md) for three ready-to-use tiers:
+
+- **Tier 1 (Conservative)** — for shared repos: only read Bash auto-approved
+- **Tier 2 (Developer)** — for solo devs: Write/Edit + build/test/git auto-approved
+- **Tier 3 (Autonomous)** — for experienced users: everything auto-approved except deny list
+
+Recommended for most users: **Tier 2**.
 
 ## Tips
 
 1. **Just describe what you need** — No need to pick agents or phases manually
-2. **Security always reviews** — Implementation work gets S2 review automatically
-3. **Specs come first** — For new features, Archon generates specs before code (quick fixes skip this)
-4. **Memory carries forward** — Agent learnings persist across sessions
-5. **Check pending reviews** — `project-state.js pending` shows what still needs security review or tests
+2. **Use `/build` for features** — Full pipeline with automatic size classification
+3. **Security always reviews** — Security agent reviews before shipping, has veto power
+4. **Specs come first** — For new features, specs are generated before code (quick fixes skip this)
+5. **Check scratchpad** — `.claude/scratchpad/` has artifacts from the last pipeline run
