@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/archon-logo.png" alt="Archon Logo" width="200">
+  <img src="assets/archon-logo.png" alt="Archon Logo" width="250">
 </p>
 
 # Archon — Intelligent Orchestrator for Claude Code
