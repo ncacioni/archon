@@ -141,13 +141,51 @@ After `npx archon init`, your `.gitignore` is updated automatically.
 
 ## Permission Setup
 
-After init, configure your permission tier in `.claude/settings.local.json`. See [docs/permission-guide.md](docs/permission-guide.md) for three ready-to-use tiers:
+**Without this step, you will get a confirmation popup for every file edit and every Bash command.**
 
-- **Tier 1 (Conservative)** — for shared repos: only read Bash auto-approved
-- **Tier 2 (Developer)** — for solo devs: Write/Edit + build/test/git auto-approved
-- **Tier 3 (Autonomous)** — for experienced users: everything auto-approved except deny list
+After init, create `.claude/settings.local.json` with the **Tier 2 (Developer)** config — recommended for most users:
 
-Recommended for most users: **Tier 2**.
+```json
+{
+  "permissions": {
+    "allow": [
+      "Write", "Edit", "WebSearch",
+      "Bash(git status*)", "Bash(git log*)", "Bash(git diff*)",
+      "Bash(git branch*)", "Bash(git show*)", "Bash(git remote*)",
+      "Bash(git add *)", "Bash(git commit *)", "Bash(git stash*)",
+      "Bash(git checkout *)", "Bash(git switch *)",
+      "Bash(git fetch*)", "Bash(git pull*)",
+      "Bash(git rev-parse*)", "Bash(git ls-remote*)",
+      "Bash(gh *)",
+      "Bash(npm run *)", "Bash(npm test*)", "Bash(npx *)",
+      "Bash(node *)", "Bash(python *)", "Bash(python3 *)",
+      "Bash(pytest *)", "Bash(cargo *)", "Bash(go *)", "Bash(make *)",
+      "Bash(tsc *)", "Bash(eslint *)", "Bash(prettier *)",
+      "Bash(jest *)", "Bash(vitest *)",
+      "Bash(ls *)", "Bash(cat *)", "Bash(head *)", "Bash(tail *)",
+      "Bash(wc *)", "Bash(pwd)", "Bash(which *)", "Bash(type *)",
+      "Bash(find *)", "Bash(tree *)", "Bash(echo *)",
+      "Bash(jq *)", "Bash(sort *)", "Bash(diff *)", "Bash(test *)",
+      "Bash(mkdir *)", "Bash(cp *)", "Bash(mv *)", "Bash(touch *)", "Bash(rm *)",
+      "Bash(docker ps*)", "Bash(docker logs*)",
+      "Bash(* --version)", "Bash(* --help)", "Bash(* --help *)"
+    ],
+    "ask": [
+      "Bash(git push *)", "Bash(git merge *)", "Bash(git rebase *)",
+      "Bash(npm install*)", "Bash(pip install *)", "Bash(pip3 install *)",
+      "Bash(curl *)", "Bash(wget *)",
+      "Bash(docker compose*)", "Bash(docker exec *)",
+      "Bash(docker build *)", "Bash(docker run *)"
+    ]
+  }
+}
+```
+
+This auto-approves file edits, git local ops, build/test/lint, and common utilities. Operations that touch the remote, install packages, or interact with containers are prompted with an "Always allow" option.
+
+If you ran `npx archon init`, you can also rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
+
+For other tiers (Conservative, Autonomous) and customization options, see [docs/permission-guide.md](docs/permission-guide.md).
 
 ## Tips
 

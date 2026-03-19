@@ -92,15 +92,63 @@ function main() {
     console.log('  Copied: commands (10)');
   }
 
-  // 10. Update .gitignore
+  // 10. Scaffold settings.local.json.example
+  scaffoldSettingsExample(CWD);
+
+  // 11. Update .gitignore
   updateGitignore(CWD);
 
-  // 11. Inject CLAUDE.md section
+  // 12. Inject CLAUDE.md section
   injectClaudeMd(CWD);
 
   console.log('\nArchon initialized successfully!');
-  console.log('Edit .archon/config.yml to configure your project.');
-  console.log('Use /build, /fix, /review, /design, /ml, etc. in Claude Code.\n');
+  console.log('Next steps:');
+  console.log('  1. Rename .claude/settings.local.json.example to .claude/settings.local.json');
+  console.log('  2. Edit .archon/config.yml to configure your project');
+  console.log('  3. Use /build, /fix, /review, /design, /ml, etc. in Claude Code\n');
+}
+
+function scaffoldSettingsExample(cwd) {
+  const examplePath = path.join(cwd, '.claude', 'settings.local.json.example');
+  if (fs.existsSync(examplePath)) {
+    console.log('  .claude/settings.local.json.example: already exists');
+    return;
+  }
+  const tier2Config = {
+    permissions: {
+      allow: [
+        "Write", "Edit", "WebSearch",
+        "Bash(git status*)", "Bash(git log*)", "Bash(git diff*)",
+        "Bash(git branch*)", "Bash(git show*)", "Bash(git remote*)",
+        "Bash(git add *)", "Bash(git commit *)", "Bash(git stash*)",
+        "Bash(git checkout *)", "Bash(git switch *)",
+        "Bash(git fetch*)", "Bash(git pull*)",
+        "Bash(git rev-parse*)", "Bash(git ls-remote*)",
+        "Bash(gh *)",
+        "Bash(npm run *)", "Bash(npm test*)", "Bash(npx *)",
+        "Bash(node *)", "Bash(python *)", "Bash(python3 *)",
+        "Bash(pytest *)", "Bash(cargo *)", "Bash(go *)", "Bash(make *)",
+        "Bash(tsc *)", "Bash(eslint *)", "Bash(prettier *)",
+        "Bash(jest *)", "Bash(vitest *)",
+        "Bash(ls *)", "Bash(cat *)", "Bash(head *)", "Bash(tail *)",
+        "Bash(wc *)", "Bash(pwd)", "Bash(which *)", "Bash(type *)",
+        "Bash(find *)", "Bash(tree *)", "Bash(echo *)",
+        "Bash(jq *)", "Bash(sort *)", "Bash(diff *)", "Bash(test *)",
+        "Bash(mkdir *)", "Bash(cp *)", "Bash(mv *)", "Bash(touch *)", "Bash(rm *)",
+        "Bash(docker ps*)", "Bash(docker logs*)",
+        "Bash(* --version)", "Bash(* --help)", "Bash(* --help *)"
+      ],
+      ask: [
+        "Bash(git push *)", "Bash(git merge *)", "Bash(git rebase *)",
+        "Bash(npm install*)", "Bash(pip install *)", "Bash(pip3 install *)",
+        "Bash(curl *)", "Bash(wget *)",
+        "Bash(docker compose*)", "Bash(docker exec *)",
+        "Bash(docker build *)", "Bash(docker run *)"
+      ]
+    }
+  };
+  fs.writeFileSync(examplePath, JSON.stringify(tier2Config, null, 2) + '\n', 'utf-8');
+  console.log('  Created: .claude/settings.local.json.example (rename to settings.local.json to activate)');
 }
 
 function copyDir(src, dest) {

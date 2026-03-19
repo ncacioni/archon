@@ -1,6 +1,32 @@
-# Archon Permission Recommendation Guide
+# Archon Permission Guide
 
-A practical guide to configuring Claude Code permissions for use with the Archon framework. Provides three copy-paste-ready permission tiers so you can choose the right balance of speed and safety for your workflow.
+A practical guide to configuring Claude Code permissions for use with the Archon framework. Provides three copy-paste-ready permission tiers with the right balance of speed and safety.
+
+---
+
+## Permission Syntax Reference
+
+Claude Code permissions use three arrays in your settings JSON:
+
+| Field | Behavior | Can override? |
+|-------|----------|---------------|
+| `allow` | Auto-approved without prompting | Yes — higher-priority scope wins |
+| `ask` | Prompted each time, with "Always allow" option | Yes — higher-priority scope wins |
+| `deny` | Unconditionally blocked | No — **deny at any level cannot be overridden** |
+
+Evaluation order: **deny first, then ask, then allow**. The first matching rule wins.
+
+### Pattern syntax
+
+Patterns use glob-style matching against tool invocations:
+
+| Pattern | Matches |
+|---------|---------|
+| `Bash(git status*)` | Any Bash call starting with `git status` |
+| `Bash(* --version)` | Any command ending with `--version` |
+| `Bash` | All Bash commands (no parentheses = match all) |
+| `Write` | All Write tool invocations |
+| `mcp_sentry_*` | All MCP tools starting with `mcp_sentry_` |
 
 ---
 
@@ -15,18 +41,21 @@ Claude Code evaluates settings from four scopes, highest priority first:
 | 3 | Project | `.claude/settings.json` | Yes (committed) |
 | 4 (lowest) | User | `~/.claude/settings.json` | No (personal) |
 
-Rules are evaluated **deny first, then ask, then allow**. The first matching rule wins.
-
 ### The critical rule
 
 **If a tool is denied at any level, no other level can allow it.**
 
-This means the deny list committed in Archon's `.claude/settings.json` cannot be overridden by your local or user settings. This is by design. The committed deny list protects against destructive operations and is non-negotiable regardless of which tier you choose.
+The deny list committed in Archon's `.claude/settings.json` cannot be overridden by local or user settings. This is by design.
 
-### Where to put your tier configuration
+### Where to put what
 
-- **Per-project (recommended):** `.claude/settings.local.json` in your Archon project root. This file is automatically gitignored and only affects you in this project.
-- **Global (all projects):** `~/.claude/settings.json`. Applies everywhere, which means the allow rules will also apply to non-Archon projects. Use this if you work solo across all your repos.
+| What | Where | Why |
+|------|-------|-----|
+| Deny list (safety floor) | `.claude/settings.json` (committed) | Shared, non-negotiable for all contributors |
+| Your permission tier | `.claude/settings.local.json` (gitignored) | Per-developer, per-project choice |
+| Universal read-only utils | `~/.claude/settings.json` (user global) | Applies to all your projects |
+
+**Recommendation:** Put your tier in `.claude/settings.local.json`. Only use global settings for universally safe patterns (like `ls`, `cat`, `--version`).
 
 ---
 
@@ -61,7 +90,9 @@ The project ships with `.claude/settings.json`:
 }
 ```
 
-**What this means:** Read, Glob, and Grep are auto-approved. Everything else (Write, Edit, every Bash command) requires manual approval on each invocation. The 13 deny patterns are enforced unconditionally.
+**What this means:** Read, Glob, and Grep are auto-approved. Everything else (Write, Edit, every Bash command) requires manual approval. The 13 deny patterns are enforced unconditionally.
+
+**Without a local settings file, you will get a confirmation popup for every file edit and every Bash command.** This is why choosing a tier below is important.
 
 ---
 
@@ -69,7 +100,7 @@ The project ships with `.claude/settings.json`:
 
 **For:** Shared repositories, team environments, open-source projects, or any context where you want human review of all writes.
 
-**Philosophy:** Allow read-only Bash operations that cannot modify state. Keep all file writes and destructive commands behind manual approval.
+**Philosophy:** Auto-approve all read-only operations. Place file writes in `ask` so you can promote them to "Always allow" at runtime if desired.
 
 ### Configuration
 
@@ -79,26 +110,38 @@ Create `.claude/settings.local.json`:
 {
   "permissions": {
     "allow": [
+      "WebSearch",
       "Bash(git status*)",
       "Bash(git log*)",
       "Bash(git diff*)",
       "Bash(git branch*)",
       "Bash(git show*)",
-      "Bash(git remote -v*)",
-      "Bash(node --version*)",
-      "Bash(npm --version*)",
-      "Bash(npx --version*)",
-      "Bash(python --version*)",
-      "Bash(python3 --version*)",
-      "Bash(* --version)",
-      "Bash(* --help)",
-      "Bash(* --help *)",
+      "Bash(git remote*)",
+      "Bash(git fetch*)",
+      "Bash(git rev-parse*)",
+      "Bash(git ls-remote*)",
       "Bash(ls *)",
       "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
       "Bash(wc *)",
       "Bash(pwd)",
       "Bash(which *)",
-      "Bash(type *)"
+      "Bash(type *)",
+      "Bash(find *)",
+      "Bash(tree *)",
+      "Bash(echo *)",
+      "Bash(jq *)",
+      "Bash(sort *)",
+      "Bash(diff *)",
+      "Bash(test *)",
+      "Bash(* --version)",
+      "Bash(* --help)",
+      "Bash(* --help *)"
+    ],
+    "ask": [
+      "Write",
+      "Edit"
     ]
   }
 }
@@ -106,35 +149,30 @@ Create `.claude/settings.local.json`:
 
 ### What this allows and why
 
-| Pattern | Rationale |
-|---------|-----------|
-| `git status/log/diff/branch/show` | Read-only git operations. Cannot modify the working tree, index, or remote. |
-| `git remote -v` | Shows remote URLs. Read-only. |
-| `--version`, `--help` | Informational flags. No side effects. |
-| `ls`, `cat`, `wc`, `pwd`, `which`, `type` | Read-only filesystem inspection. |
+| Category | Patterns | Rationale |
+|----------|----------|-----------|
+| **Git read ops** | `status`, `log`, `diff`, `branch`, `show`, `remote`, `fetch`, `rev-parse`, `ls-remote` | Read-only. Cannot modify working tree, index, or remote. |
+| **File inspection** | `ls`, `cat`, `head`, `tail`, `wc`, `pwd`, `which`, `type`, `find`, `tree` | Read-only filesystem inspection. |
+| **Data utilities** | `jq`, `sort`, `diff`, `echo`, `test` | Read-only text processing and conditionals. |
+| **Info flags** | `--version`, `--help` | Informational. No side effects. |
+| **Web search** | `WebSearch` | Read-only information retrieval. |
 
-### What still requires approval
+### What `ask` does here
 
-- **All file writes** (Write, Edit) -- every code change is reviewed.
-- **All mutating Bash commands** -- `npm install`, `git commit`, `git push`, build scripts, anything that changes state.
-- **Network commands** -- `curl`, `wget`, `fetch` all require approval.
-
-### What is blocked (from committed deny list)
-
-All 13 destructive patterns remain enforced. Cannot be overridden.
+`Write` and `Edit` are in `ask`, not `allow`. This means Claude will prompt you each time, but with an **"Always allow"** option. If you find yourself approving every edit, click "Always allow" and it effectively becomes Tier 2 for that session.
 
 ### Best agents for this tier
 
-- **architect** and **spec-writer**: Primarily read and analyze code, produce documents. Minimal friction from Conservative since they mostly read.
-- **security**: Read-only by design (its tool list is `Read, Glob, Grep, Bash`). Benefits from git read auto-approval for reviewing history.
+- **architect**, **security**: Read-only by design. Near-zero friction.
+- **spec-writer**: Mostly reads, occasional writes prompt for review.
 
 ---
 
 ## Tier 2: Developer
 
-**For:** Solo developers working on their own projects. You trust Claude to write code and run build/test/lint commands, but you want guardrails on deployment and system-level operations.
+**For:** Solo developers working on their own projects. The "just works" tier for day-to-day development.
 
-**Philosophy:** Auto-approve file edits and safe development commands. Require approval for anything that touches the network, installs packages, or interacts with production systems.
+**Philosophy:** Auto-approve file edits and all safe development commands. Use `ask` for operations that touch the remote, install packages, or interact with containers — you get prompted but can "Always allow" if you trust the pattern.
 
 ### Configuration
 
@@ -146,32 +184,30 @@ Create `.claude/settings.local.json`:
     "allow": [
       "Write",
       "Edit",
+      "WebSearch",
       "Bash(git status*)",
       "Bash(git log*)",
       "Bash(git diff*)",
       "Bash(git branch*)",
       "Bash(git show*)",
-      "Bash(git remote -v*)",
+      "Bash(git remote*)",
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git stash*)",
       "Bash(git checkout *)",
       "Bash(git switch *)",
-      "Bash(git merge *)",
-      "Bash(git rebase *)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git rev-parse*)",
+      "Bash(git ls-remote*)",
+      "Bash(gh *)",
       "Bash(npm run *)",
       "Bash(npm test*)",
-      "Bash(npm run build*)",
-      "Bash(npm run lint*)",
-      "Bash(npm run format*)",
       "Bash(npx *)",
       "Bash(node *)",
-      "Bash(node --test*)",
       "Bash(python *)",
       "Bash(python3 *)",
       "Bash(pytest *)",
-      "Bash(pip install *)",
-      "Bash(pip3 install *)",
       "Bash(cargo *)",
       "Bash(go *)",
       "Bash(make *)",
@@ -182,17 +218,43 @@ Create `.claude/settings.local.json`:
       "Bash(vitest *)",
       "Bash(ls *)",
       "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
       "Bash(wc *)",
       "Bash(pwd)",
       "Bash(which *)",
       "Bash(type *)",
+      "Bash(find *)",
+      "Bash(tree *)",
+      "Bash(echo *)",
+      "Bash(jq *)",
+      "Bash(sort *)",
+      "Bash(diff *)",
+      "Bash(test *)",
       "Bash(mkdir *)",
       "Bash(cp *)",
       "Bash(mv *)",
       "Bash(touch *)",
+      "Bash(rm *)",
+      "Bash(docker ps*)",
+      "Bash(docker logs*)",
       "Bash(* --version)",
       "Bash(* --help)",
       "Bash(* --help *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(npm install*)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(docker compose*)",
+      "Bash(docker exec *)",
+      "Bash(docker build *)",
+      "Bash(docker run *)"
     ]
   }
 }
@@ -202,46 +264,45 @@ Create `.claude/settings.local.json`:
 
 | Category | Patterns | Rationale |
 |----------|----------|-----------|
-| **File editing** | `Write`, `Edit` | Core development workflow. Solo dev reviews the diff in Claude's output. |
-| **Git local ops** | `add`, `commit`, `stash`, `checkout`, `switch`, `merge`, `rebase` | All local-only. Nothing touches the remote. |
-| **Build/test/lint** | `npm run *`, `npm test`, `node`, `pytest`, `cargo`, `go`, `make`, etc. | Standard dev loop. Build artifacts are local. |
-| **Package install** | `pip install`, `npm` via `npx` | Needed for dependency management during development. |
-| **Filesystem** | `mkdir`, `cp`, `mv`, `touch` | Common file operations for scaffolding. |
+| **File editing** | `Write`, `Edit` | Core dev workflow. No more "Make this edit?" popups. |
+| **Git local ops** | `add`, `commit`, `stash`, `checkout`, `switch`, `fetch`, `pull` | Local-only or download-only. Nothing pushes to remote. |
+| **GitHub CLI** | `gh *` | PRs, issues, checks. Useful for Archon command workflows. |
+| **Build/test/lint** | `npm run`, `npx`, `node`, `python`, `pytest`, `cargo`, `go`, `make`, `tsc`, `eslint`, `prettier`, `jest`, `vitest` | Standard dev loop. Build artifacts are local. |
+| **File inspection** | `ls`, `cat`, `head`, `tail`, `wc`, `find`, `tree`, `jq`, `sort`, `diff`, `echo`, `test` | Read-only utilities. |
+| **Filesystem ops** | `mkdir`, `cp`, `mv`, `touch`, `rm` | Common file operations. Note: `rm -rf` and `rm -r` remain hard-denied. |
+| **Container read** | `docker ps`, `docker logs` | Read-only container inspection. |
 
-### What still requires approval
+### What `ask` covers and why
 
-| Operation | Why |
-|-----------|-----|
-| `git push *` | Pushes to remote. You should review what is being pushed and where. |
-| `git push --tags*` | Tag pushes can trigger CI/CD pipelines and releases. |
-| `npm publish *` | Publishes packages. Irreversible in practice. |
-| `npm install *` (bare) | Note: `npm run *` is allowed but bare `npm install` is not listed -- add it explicitly if you want it auto-approved. |
-| `docker *` | Container operations can affect system state. |
-| `curl *`, `wget *` | Network requests. Could exfiltrate data or download malicious content. |
-| `ssh *`, `scp *` | Remote system access. |
-| `sudo *` | Privilege escalation. |
-| `rm *` (single files) | Simple `rm` is not in the deny list but is also not auto-approved here. Add `Bash(rm *)` to allow if you want. Note: `rm -rf` and `rm -r` remain denied regardless. |
-| `chmod *`, `chown *` | Permission changes (except `chmod 777` which is hard-denied). |
+| Pattern | Why prompted |
+|---------|-------------|
+| `git push *` | Pushes to remote. Review what and where. |
+| `git merge *`, `git rebase *` | Can rewrite history or create conflicts. |
+| `npm install*`, `pip install *` | Installs packages — supply chain risk. |
+| `curl *`, `wget *` | Network requests. Could exfiltrate data. |
+| `docker compose*`, `docker exec *`, `docker build *`, `docker run *` | Container mutations — start/stop services, run arbitrary commands. |
+
+Everything in `ask` can be promoted to "Always allow" at runtime if you decide the pattern is safe in your context.
 
 ### What is blocked (from committed deny list)
 
-All 13 destructive patterns. Cannot be overridden. Even with `git checkout *` allowed, the specific `git checkout -- .` and `git checkout -- *` patterns (which discard all unstaged changes) remain denied because the deny list takes precedence.
+All 13 destructive patterns. Cannot be overridden. Even with `git checkout *` allowed, the specific `git checkout -- .` and `git checkout -- *` patterns remain denied because deny takes precedence.
 
 ### Best agents for this tier
 
-- **builder**: Writes domain logic, runs tests, commits. Maximum benefit -- nearly friction-free development loop.
-- **frontend**: Writes components, runs dev server, runs linters. Smooth workflow.
-- **qa**: Writes tests, runs test suites, runs linters. Can execute the full test pipeline uninterrupted.
-- **data**: Writes migrations, runs scripts. Good productivity boost.
-- **devops**: Benefits from build/test auto-approval but will still be prompted for Docker and deployment commands, which is appropriate.
+- **builder**: Zero friction for the write-test-commit loop.
+- **frontend**: Writes components, runs dev server and linters smoothly.
+- **qa**: Writes and runs tests without interruption.
+- **data**: Writes migrations and scripts freely.
+- **devops**: Build/test auto-approved; Docker and deploy prompted appropriately.
 
 ---
 
 ## Tier 3: Autonomous
 
-**For:** Experienced developers who understand the risks, working in isolated environments (containers, VMs, disposable branches), or running CI/CD-like automation.
+**For:** Experienced developers in isolated environments (containers, VMs, disposable branches), or running CI/CD-like automation.
 
-**Philosophy:** Auto-approve nearly everything. Rely on the hard deny list as the safety net. You are trading review friction for speed.
+**Philosophy:** Auto-approve nearly everything. Rely on the hard deny list plus an extended deny list as your safety net.
 
 ### Configuration
 
@@ -253,49 +314,9 @@ Create `.claude/settings.local.json`:
     "allow": [
       "Write",
       "Edit",
-      "Bash"
-    ]
-  }
-}
-```
-
-Yes, that is the entire configuration. `Bash` without a specifier matches all Bash commands. The committed deny list still applies.
-
-### What this allows
-
-Everything except what the deny list blocks. All file writes, all Bash commands, all git operations, all network commands, all package management.
-
-### The non-negotiable deny list
-
-These 13 patterns remain enforced. They cannot be overridden by any allow rule at any scope level. This is your safety net.
-
-| Pattern | Threat |
-|---------|--------|
-| `rm -rf *` | Recursive forced deletion. Can destroy entire directory trees. |
-| `rm -r *` | Recursive deletion. Same risk without force flag. |
-| `find * -delete*` | Mass deletion via find. Can target thousands of files. |
-| `git push --force*` | Force-push rewrites remote history. Can destroy teammates' work. |
-| `git push -f*` | Short form of force-push. Same risk. |
-| `git reset --hard*` | Discards all uncommitted changes irreversibly. |
-| `git clean -f*` | Deletes untracked files. Cannot be undone. |
-| `git checkout -- .` | Discards all unstaged changes in the working tree. |
-| `git checkout -- *` | Discards unstaged changes for specific paths. |
-| `curl * \| sh*` | Pipe-to-shell. Remote code execution. |
-| `curl * \| bash*` | Pipe-to-bash. Remote code execution. |
-| `wget * \| sh*` | Pipe-to-shell via wget. Remote code execution. |
-| `chmod 777*` | World-writable permissions. Security anti-pattern. |
-
-### Additional deny patterns to consider
-
-If you use Tier 3, consider adding these to your local deny list for defense-in-depth:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Write",
-      "Edit",
-      "Bash"
+      "Bash",
+      "WebSearch",
+      "WebFetch"
     ],
     "deny": [
       "Bash(sudo *)",
@@ -324,42 +345,147 @@ If you use Tier 3, consider adding these to your local deny list for defense-in-
 }
 ```
 
-These cover: privilege escalation (`sudo`), irreversible publishing (`npm publish`), database destruction (`DROP`), disk destruction (`dd`, `mkfs`), additional force-push variants with remote names (`git push origin -f`), system control (`shutdown`, `reboot`), and secret file access (`.env`, credentials).
+`Bash` without a specifier matches all Bash commands. The committed deny list (13 patterns) plus this extended deny list (21 patterns) create a comprehensive safety net.
+
+### Extended deny list explained
+
+| Category | Patterns | Threat |
+|----------|----------|--------|
+| **Privilege escalation** | `sudo *` | Root access. |
+| **Irreversible publishing** | `npm publish*` | Distributes packages publicly. |
+| **Container destruction** | `docker rm -f*`, `docker system prune*` | Destroys running containers or cached images. |
+| **Database destruction** | `DROP DATABASE*`, `DROP TABLE*`, `truncate *` | Irreversible data loss. |
+| **Disk destruction** | `> /dev/sda*`, `mkfs*`, `dd if=*` | Overwrites disk or partitions. |
+| **Force-push variants** | `git push * --force*`, `git push * -f*` | Catches `git push origin -f` (flag after remote). |
+| **System control** | `shutdown*`, `reboot*` | Machine shutdown. |
+| **Root deletion** | `rm -rf /` | Destroys entire filesystem. |
+| **Secret access** | `Read(.env*)`, `Read(credentials*)` | Prevents accidental reading of secrets. |
 
 ### Risk assessment
 
 | Risk | Mitigation |
 |------|------------|
-| Accidental `git push` to wrong branch | Committed deny blocks force-push; normal push is recoverable via revert. |
+| Accidental `git push` to wrong branch | Normal push is recoverable via revert; force-push is denied. |
 | Package install of malicious dep | Low risk in solo context; use lockfiles. |
-| Network exfiltration | Accept the risk or add `Bash(curl *)` to deny. |
+| Network exfiltration | Accept the risk or move `curl`/`wget` to a deny pattern. |
 | Overwriting important files | Git tracks changes; `git diff` before committing. |
-| Running destructive DB commands | Add DB-specific deny patterns (see above). |
 
 ### Best agents for this tier
 
-All agents run at maximum speed. The primary beneficiaries are:
+All agents run at maximum speed. Primary beneficiaries:
 - **builder**: Zero friction for the full build-test-commit cycle.
-- **devops**: Can run Docker, deploy scripts, CI commands without interruption.
-- **ml-engineer**: Can install packages, run training scripts, manage GPU resources.
-- **data**: Can run migrations, ETL scripts, database operations.
+- **devops**: Docker, deploy scripts, CI commands without interruption.
+- **ml-engineer**: Package installs, training scripts, GPU resource management.
+- **data**: Migrations, ETL scripts, database operations.
 
 ---
 
 ## Operations That Should ALWAYS Require Human Confirmation
 
-Regardless of which tier you choose, certain operations warrant a human in the loop. These are not all covered by the committed deny list (which is syntactic pattern matching), so this is a judgment guide:
+Regardless of which tier you choose, these operations warrant a human in the loop. They are not all coverable by pattern matching:
 
-1. **Pushing to `main`/`master`/`production` branches** -- Even normal push (not force) to protected branches deserves review.
-2. **Publishing packages** (`npm publish`, `pip upload`, `cargo publish`) -- Irreversible distribution of code.
+1. **Pushing to `main`/`master`/`production` branches** -- Even normal push to protected branches.
+2. **Publishing packages** (`npm publish`, `pip upload`, `cargo publish`) -- Irreversible distribution.
 3. **Deploying to production** -- Any command that affects live users.
-4. **Deleting cloud resources** -- Terraform destroy, AWS resource deletion, etc.
-5. **Modifying authentication/authorization** -- Changing who can access what.
+4. **Deleting cloud resources** -- Terraform destroy, AWS resource deletion.
+5. **Modifying authentication/authorization** -- Changing access controls.
 6. **Running database migrations on production** -- Schema changes on live data.
 7. **Generating or rotating secrets** -- Key material handling.
-8. **Modifying CI/CD pipeline definitions** -- Changes that affect what runs automatically.
+8. **Modifying CI/CD pipeline definitions** -- Changes to automated processes.
 
-For Tiers 1 and 2, most of these are already behind approval prompts. For Tier 3, add explicit deny patterns or rely on your CLAUDE.md instructions to flag these for review.
+For Tiers 1 and 2, most of these are already behind prompts. For Tier 3, the extended deny list covers several, and CLAUDE.md instructions handle the rest.
+
+---
+
+## Customizing for Your Stack
+
+The tiers above cover common development tools. Add patterns for your specific stack:
+
+### Docker-heavy projects
+
+```json
+"allow": [
+  "Bash(docker ps*)",
+  "Bash(docker logs*)",
+  "Bash(docker images*)",
+  "Bash(docker inspect*)"
+],
+"ask": [
+  "Bash(docker compose*)",
+  "Bash(docker exec *)",
+  "Bash(docker build *)",
+  "Bash(docker run *)",
+  "Bash(docker stop *)"
+]
+```
+
+### Cloud CLI (AWS/GCP/Azure)
+
+```json
+"ask": [
+  "Bash(aws *)",
+  "Bash(gcloud *)",
+  "Bash(az *)",
+  "Bash(terraform plan*)"
+],
+"deny": [
+  "Bash(terraform destroy*)",
+  "Bash(aws s3 rm *)",
+  "Bash(gcloud * delete*)"
+]
+```
+
+### MCP tools
+
+If you use MCP servers (e.g., Sentry, database tools), add their prefixes:
+
+```json
+"allow": [
+  "mcp_sentry_*",
+  "mcp_postgres_query*"
+],
+"deny": [
+  "mcp_postgres_execute*"
+]
+```
+
+### Data engineering (dbt, Airflow, Snowflake)
+
+```json
+"allow": [
+  "Bash(dbt run*)",
+  "Bash(dbt test*)",
+  "Bash(dbt build*)",
+  "Bash(dbt compile*)",
+  "Bash(dbt ls*)"
+],
+"ask": [
+  "Bash(dbt seed*)",
+  "Bash(airflow *)",
+  "Bash(snowsql *)"
+]
+```
+
+---
+
+## Troubleshooting: Still Getting Prompts?
+
+If you configured a tier but still see confirmation popups:
+
+1. **Check file location.** The file must be `.claude/settings.local.json` in the project root (not inside `docs/` or `.archon/`).
+
+2. **Check JSON syntax.** A malformed JSON file is silently ignored. Validate with:
+   ```bash
+   node -e "JSON.parse(require('fs').readFileSync('.claude/settings.local.json','utf-8'))" && echo "Valid" || echo "Invalid"
+   ```
+
+3. **Restart the session.** Permission changes take effect on new sessions, not mid-conversation.
+
+4. **Check for deny conflicts.** If a pattern is in the committed deny list, your local allow cannot override it. Run `/permissions` in Claude Code to see the merged rule set.
+
+5. **Check the exact command.** The pattern must match. `Bash(npm run *)` matches `npm run test` but not bare `npm run`. Add both if needed.
+
+6. **Check scope priority.** A managed or local deny overrides a project allow. Use `/permissions` to see which rules are active and from which scope.
 
 ---
 
@@ -381,11 +507,11 @@ For Tiers 1 and 2, most of these are already behind approval prompts. For Tier 3
 ## Applying Your Configuration
 
 1. Choose your tier from above.
-2. Create the file:
-   - Per-project: `.claude/settings.local.json` in your Archon project
-   - Global: `~/.claude/settings.json`
+2. Create `.claude/settings.local.json` in your project root.
+   - Alternatively, use `~/.claude/settings.json` for global settings.
+   - If you ran `npx archon init`, rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
 3. Paste the JSON block for your chosen tier.
 4. Restart Claude Code or start a new session.
 5. Verify with `/permissions` to see the merged rule set.
 
-The committed `.claude/settings.json` deny list is always enforced. Your local settings add allow rules on top. You never need to duplicate the deny list in your local settings (though you can add to it, as shown in the Tier 3 extended deny list).
+The committed `.claude/settings.json` deny list is always enforced. Your local settings add allow/ask rules on top. You never need to duplicate the deny list in your local settings (though you can extend it, as shown in Tier 3).
