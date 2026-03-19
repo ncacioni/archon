@@ -50,7 +50,7 @@ npx archon init
 # That's it. Open Claude Code and use /build, /fix, /review, etc.
 ```
 
-The `init` command scaffolds `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad).
+The `init` command scaffolds `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). Then configure permissions — copy Tier 2 into `.claude/settings.local.json` to avoid constant approval popups. See [permission guide](docs/permission-guide.md).
 
 ## Solo Mode (Default)
 
