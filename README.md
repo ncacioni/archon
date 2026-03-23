@@ -45,7 +45,7 @@ Or just describe what you need naturally — Archon detects the intent and dispa
 
 ```bash
 # Initialize Archon in your project
-npx archon init
+npx github:ncacioni/archon init
 
 # That's it. Open Claude Code and use /build, /fix, /review, etc.
 ```
@@ -123,7 +123,7 @@ node --test __tests__/*.test.js
   commands/          10 deterministic workflow entry points
   scratchpad/        Inter-agent state (gitignored, ephemeral)
 docs/                Framework documentation
-bin/                 CLI (npx archon init)
+bin/                 CLI (npx github:ncacioni/archon init)
 .archon/
   runtime/           5 modules + test suite
   toolkits/          Agent toolkit indices + tool definitions (YAML)

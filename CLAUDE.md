@@ -70,7 +70,7 @@ When the user asks you to do something:
   scratchpad/        Inter-agent state (gitignored, ephemeral)
   settings.json      Claude Code settings
 docs/                Framework documentation and guides
-bin/                 CLI entry point (npx archon init)
+bin/                 CLI entry point (npx github:ncacioni/archon init)
 .archon/
   runtime/           Runtime modules (project-state, scout-service, toolkit-loader, maintenance, integrity)
   toolkits/          Agent toolkit indices + tool definitions (YAML)
