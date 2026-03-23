@@ -2,7 +2,7 @@
 
 /**
  * Archon CLI
- * Usage: npx archon init
+ * Usage: npx github:ncacioni/archon init
  */
 
 import fs from 'node:fs';
@@ -242,7 +242,7 @@ if (process.argv[1] && import.meta.url === `file:///${process.argv[1].replace(/\
   if (subcommand === 'init' || !subcommand) {
     main();
   } else {
-    console.error(`Unknown command: ${subcommand}\nUsage: npx archon init`);
+    console.error(`Unknown command: ${subcommand}\nUsage: npx github:ncacioni/archon init`);
     process.exit(1);
   }
 }

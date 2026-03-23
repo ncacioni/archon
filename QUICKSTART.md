@@ -4,7 +4,7 @@
 
 ```bash
 cd your-project
-npx archon init
+npx github:ncacioni/archon init
 ```
 
 This creates `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). It also updates `CLAUDE.md` and `.gitignore`.
@@ -116,7 +116,7 @@ Claude analyzes the scope, proposes an architecture and agent sequence, and exec
 
 ## What Gets Committed vs Ignored
 
-After `npx archon init`, your `.gitignore` is updated automatically.
+After `npx github:ncacioni/archon init`, your `.gitignore` is updated automatically.
 
 **Committed (shared with team):**
 | Path | Purpose |
@@ -183,7 +183,7 @@ After init, create `.claude/settings.local.json` with the **Tier 2 (Developer)**
 
 This auto-approves file edits, git local ops, build/test/lint, and common utilities. Operations that touch the remote, install packages, or interact with containers are prompted with an "Always allow" option.
 
-If you ran `npx archon init`, you can also rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
+If you ran `npx github:ncacioni/archon init`, you can also rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
 
 For other tiers (Conservative, Autonomous) and customization options, see [docs/permission-guide.md](docs/permission-guide.md).
 

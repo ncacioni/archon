@@ -509,7 +509,7 @@ If you configured a tier but still see confirmation popups:
 1. Choose your tier from above.
 2. Create `.claude/settings.local.json` in your project root.
    - Alternatively, use `~/.claude/settings.json` for global settings.
-   - If you ran `npx archon init`, rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
+   - If you ran `npx github:ncacioni/archon init`, rename `.claude/settings.local.json.example` to `.claude/settings.local.json`.
 3. Paste the JSON block for your chosen tier.
 4. Restart Claude Code or start a new session.
 5. Verify with `/permissions` to see the merged rule set.
