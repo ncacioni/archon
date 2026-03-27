@@ -1,3 +1,9 @@
+## [3.1.1](https://github.com/ncacioni/archon/compare/v3.1.0...v3.1.1) (2026-03-27)
+
+### Bug Fixes
+
+* disable body/footer line length rules in commitlint ([79e154c](https://github.com/ncacioni/archon/commit/79e154c5c01970d89ed8d93301bb1482bbc60455))
+
 ## [3.1.0](https://github.com/ncacioni/archon/compare/v3.0.0...v3.1.0) (2026-03-27)
 
 ### Features
