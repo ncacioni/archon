@@ -29,7 +29,59 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 2. Supply Chain Security
+## 2. Automated Releases (semantic-release)
+
+Automate versioning, changelogs, and GitHub releases from conventional commits.
+
+### Setup
+
+```json
+// .releaserc.json
+{
+  "branches": ["main"],
+  "plugins": [
+    ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
+    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+    ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
+    ["@semantic-release/git", { "assets": ["CHANGELOG.md", "package.json"] }],
+    "@semantic-release/github"
+  ]
+}
+```
+
+### Conventional Commits
+
+```
+<type>(<scope>): <description>
+
+feat:     → minor bump (new feature)
+fix:      → patch bump (bug fix)
+perf:     → patch bump (performance)
+refactor: → patch bump (code restructure)
+docs:     → no release
+chore:    → no release
+ci:       → no release
+test:     → no release
+
+BREAKING CHANGE: in footer → major bump
+```
+
+### CI Workflow
+
+- **On push to main**: `semantic-release` analyzes commits since last tag, bumps version, generates changelog, creates GitHub release
+- **On PR**: `commitlint` validates all commit messages follow conventional format
+- **Lockfile committed**: Required for `npm ci` in CI (reproducible builds)
+
+### Rules
+
+- Never bump versions manually — semantic-release owns the version
+- Never edit CHANGELOG.md manually — it's auto-generated
+- Commit messages are the release API — write them carefully
+- Use `[skip ci]` in release commits to avoid infinite loops
+
+---
+
+## 3. Supply Chain Security
 
 - **Pin dependencies**: Lockfile committed, exact versions
 - **Verify integrity**: Checksums, signatures (npm `--ignore-scripts` for audit)
@@ -40,7 +92,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 3. Observability — Logs
+## 4. Observability — Logs
 
 - **Format**: Structured JSON, every entry includes correlation ID
 - **Fields**: `level`, `message`, `timestamp`, `service`, `trace_id`, `span_id`, `request_id`
@@ -51,7 +103,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 4. Observability — Metrics
+## 5. Observability — Metrics
 
 - **RED method** (services): Rate, Error rate, Duration
 - **USE method** (resources): Utilization, Saturation, Errors
@@ -62,7 +114,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 5. Observability — Traces
+## 6. Observability — Traces
 
 - **OpenTelemetry SDK**: Auto-instrumentation + manual spans for business logic
 - **W3C Trace Context**: Propagate `traceparent` header across all services
@@ -72,7 +124,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 6. Alerting
+## 7. Alerting
 
 | Severity | Channel | Response Time |
 |----------|---------|---------------|
@@ -94,7 +146,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 7. SLO Tracking
+## 8. SLO Tracking
 
 - **SLI**: Measurable indicator (success rate, latency p99)
 - **SLO**: Target (99.9% availability, p99 < 500ms)
@@ -104,7 +156,7 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 
 ---
 
-## 8. Containers
+## 9. Containers
 
 ```dockerfile
 # Multi-stage build
@@ -132,7 +184,7 @@ CMD ["server.js"]
 
 ---
 
-## 9. Infrastructure as Code
+## 10. Infrastructure as Code
 
 - **Terraform**: Modules for reuse, remote state backend (S3 + DynamoDB lock), `plan` → review → `apply`
 - **Pulumi**: Same patterns but in programming languages (TypeScript, Python, Go)
@@ -142,7 +194,7 @@ CMD ["server.js"]
 
 ---
 
-## 10. GitOps
+## 11. GitOps
 
 - **ArgoCD/Flux**: Watch git repo, sync cluster state to match declarative config
 - **Git as source of truth**: All changes through PRs, never `kubectl apply` manually
@@ -151,7 +203,7 @@ CMD ["server.js"]
 
 ---
 
-## 11. Incident Response
+## 12. Incident Response
 
 ### Classification
 - **P1**: System down, data breach, security incident → page immediately
