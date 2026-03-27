@@ -89,6 +89,39 @@ BREAKING CHANGE: in footer → major bump
 - **SBOM**: Generate with Syft/CycloneDX for every release
 - **SLSA Level 2+**: Tamper-resistant build service, provenance attestation
 - **Audit in CI**: `npm audit`, `pip audit`, `cargo audit` — fail on critical
+- **Dependabot**: Automated dependency update PRs + vulnerability alerts (GitHub-native, zero cost)
+- **CodeQL**: Static analysis for security vulnerabilities and bugs (GitHub-native, free for public repos)
+
+### Dependabot Config
+
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "npm"       # or pip, cargo, docker, etc.
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps):"      # conventional commit format
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci:"
+```
+
+### CodeQL Workflow
+
+```yaml
+# .github/workflows/codeql.yml — runs on push, PR, and weekly schedule
+- github/codeql-action/init@v3       # initialize scanner
+- github/codeql-action/autobuild@v3  # build project
+- github/codeql-action/analyze@v3    # run analysis
+```
+
+**Proactive guidance**: When setting up CI/CD for a project, always suggest Dependabot + CodeQL as baseline security automation. These are free, GitHub-native, and require minimal config.
 
 ---
 
