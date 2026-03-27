@@ -1,5 +1,16 @@
 Design, build, and validate data infrastructure — schemas, migrations, pipelines, and quality gates.
 
+## Output Protocol
+
+**MANDATORY**: You MUST output visible text to the user after completing each phase. This is not optional. The user must see real-time progress as the pipeline executes.
+
+Between every phase:
+1. Output a brief status update (3-5 lines) describing what was done, key decisions made, and issues found
+2. If in plan mode, still output commentary — do not silently plan without explanation
+3. Write artifacts to scratchpad AND summarize findings in visible text
+
+**Silent execution is a bug.** If the user sees no output between agent spawns, the pipeline is broken.
+
 ## Input
 $ARGUMENTS
 
