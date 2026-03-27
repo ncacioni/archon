@@ -13,7 +13,7 @@ export default {
       'ci',       // CI/CD changes
       'revert',   // Reverts a previous commit
     ]],
-    'subject-case': [2, 'always', 'lower-case'],
+    'subject-case': [0],
     'header-max-length': [2, 'always', 100],
   },
 };
