@@ -6,6 +6,10 @@
   "bin": {
     "archon": "./bin/archon-init.js"
   },
+  "scripts": {
+    "test": "cd .archon/runtime && node --test __tests__/*.test.js",
+    "commitlint": "commitlint --edit"
+  },
   "keywords": [
     "claude-code",
     "ai-development",
@@ -16,5 +20,13 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.0.0"
   }
 }
