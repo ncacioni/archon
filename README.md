@@ -113,6 +113,22 @@ node --test __tests__/*.test.js
 4. **Deterministic pipelines** — Commands define exact agent sequences. No more skipped steps.
 5. **Progress over ceremony** — Concise status updates after each phase. No gate approvals, no agent labels.
 
+## CI/CD
+
+Archon uses [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and releases.
+
+- **Conventional commits** enforced via [commitlint](https://commitlint.js.org/) on PRs
+- **Automatic releases** on push to `main` — version bump, changelog, and GitHub release
+- Commit format: `type(scope): description` — `feat:` → minor, `fix:` → patch, `BREAKING CHANGE:` → major
+
+```
+feat: add user authentication agent        → v1.1.0
+fix: correct security veto logic           → v1.0.1
+feat!: redesign command pipeline structure  → v2.0.0
+```
+
+The devops agent includes semantic-release patterns in its `devops-patterns` skill, available to both `/deploy` (for scaffolding CI/CD) and `/build` (Phase 7: Documentation).
+
 ## Repository Structure
 
 ```
@@ -122,6 +138,8 @@ node --test __tests__/*.test.js
   skills/            11 reusable domain knowledge skills
   commands/          10 deterministic workflow entry points
   scratchpad/        Inter-agent state (gitignored, ephemeral)
+.github/
+  workflows/         release.yml (semantic-release) + commitlint.yml (PR validation)
 docs/                Framework documentation
 bin/                 CLI (npx github:ncacioni/archon init)
 .archon/
