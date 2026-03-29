@@ -4,10 +4,18 @@
 
 ```bash
 cd your-project
+
+# Shared install (framework files committed to git — for teams)
 npx github:ncacioni/archon init
+
+# Local install (framework files gitignored — for solo developers)
+npx github:ncacioni/archon init --local
+
+# Upgrade an existing installation
+npx github:ncacioni/archon upgrade
 ```
 
-This creates `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). It also updates `CLAUDE.md` and `.gitignore`.
+This creates `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). It also updates `CLAUDE.md` and `.gitignore`. Use `--local` if you're a solo developer and don't want framework files in your repo.
 
 ## 2. Use with Claude Code
 

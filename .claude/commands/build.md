@@ -38,12 +38,38 @@ Write classification to `.claude/scratchpad/classification.json`:
 }
 ```
 
-**After classification, report to the user:**
-- Task size and reasoning
-- Current mode (run `node .archon/runtime/config-loader.js mode`)
-- Agents that will be used and phases that will run
-- If mode is `solo` and size is M or larger, note that team mode is available and what it would expand (e.g., "builder would expand to domain-logic → app-services → adapter-layer"). Let the user decide whether to switch.
-- If the user asks to change mode, update `.archon/config.yml` and re-resolve.
+**After classification, evaluate mode and report to the user:**
+
+1. Get current mode: `node .archon/runtime/config-loader.js mode`
+2. Score whether team mode would benefit this task (0-100):
+
+| Signal | Points |
+|--------|--------|
+| Size is L | +20 |
+| Size is XL | +35 |
+| 3 affected areas | +15 |
+| 4+ affected areas | +25 (replaces +15) |
+| Multiple bounded contexts touched | +15 |
+| Complex architecture (API + DB + queue/events + frontend) | +10 |
+
+3. Add `mode_evaluation` to `classification.json`:
+```json
+{
+  "mode_evaluation": {
+    "current_mode": "solo",
+    "score": 55,
+    "signals": ["Size L (+20)", "3 affected areas (+15)", "2 bounded contexts (+15)", "Complex architecture (+10)"],
+    "recommendation": "team"
+  }
+}
+```
+
+4. Report to the user:
+   - Task size, reasoning, affected areas, phases that will run
+   - Current mode and agents that will be used
+   - **If score >= 40**: show the score, signals, and what team mode would expand. Let the user decide.
+   - **If score < 40**: just show the current mode, no recommendation
+   - If the user says "switch to team mode", update `.archon/config.yml` and re-resolve.
 
 ### Pre-phase: Agent Resolution
 

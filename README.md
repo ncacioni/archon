@@ -56,13 +56,19 @@ Or just describe what you need naturally — Archon detects the intent and dispa
 ## Quick Start
 
 ```bash
-# Initialize Archon in your project
+# Initialize Archon in your project (framework files committed to git)
 npx github:ncacioni/archon init
+
+# Or keep framework files local-only (solo developer, not shared)
+npx github:ncacioni/archon init --local
+
+# Upgrade an existing installation to the latest version
+npx github:ncacioni/archon upgrade
 
 # That's it. Open Claude Code and use /build, /fix, /review, etc.
 ```
 
-The `init` command scaffolds `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). Then configure permissions — copy Tier 2 into `.claude/settings.local.json` to avoid constant approval popups. See [permission guide](docs/permission-guide.md).
+The `init` command scaffolds `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). Use `--local` to gitignore all framework files (recommended for solo developers). Then configure permissions — copy Tier 2 into `.claude/settings.local.json` to avoid constant approval popups. See [permission guide](docs/permission-guide.md).
 
 ## Solo Mode (Default)
 
