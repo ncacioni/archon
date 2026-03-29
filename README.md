@@ -148,6 +148,16 @@ bin/                 CLI (npx github:ncacioni/archon init)
   config.yml         Project configuration
 ```
 
+## Recommended Tools
+
+These are optional but improve the Archon experience:
+
+| Tool | What it does | Install |
+|------|-------------|---------|
+| [codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) | Builds a knowledge graph of your codebase — call paths, impact analysis, dead code detection. Agents use it to understand code before modifying it. | Install globally in `~/.claude/settings.json` as an MCP server |
+
+MCP servers are personal tools (global config, not committed to the repo). The index is per-project and created on demand.
+
 ## Documentation
 
 | Document | Description |
