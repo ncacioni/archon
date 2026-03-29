@@ -1,3 +1,34 @@
+## [3.4.0](https://github.com/ncacioni/archon/compare/v3.3.0...v3.4.0) (2026-03-29)
+
+### ⚠ BREAKING CHANGES
+
+* commands now require config-loader.js resolve-all for agent
+resolution. The agent-map.json contract replaces ad-hoc per-phase resolution.
+
+Deterministic agent resolution:
+- resolveAll() in config-loader.js resolves all pipeline agents in one call
+- All 11 commands have Pre-phase: Agent Resolution writing agent-map.json
+- Phases read from agent-map.json (single source of truth per pipeline run)
+
+/audit command:
+- New command: security → qa → architect → consolidated P0/P1/P2 report
+- --framework flag audits Archon's own agents, skills, commands, toolkits
+- Enables self-improving feedback loop
+
+Mode transparency in /build:
+- Phase 0 now reports mode, agents, and phases to user before proceeding
+- For M+ tasks in solo mode, suggests team mode with expansion preview
+- User can switch mode before pipeline continues
+
+65 tests across 6 suites, 11 commands, 25 deny patterns.
+Designed, built, and validated via full dogfooding pipeline.
+
+Co-Authored-By: Claudryx
+
+### Features
+
+* v4 — deterministic agent resolution, /audit command, mode transparency ([2932909](https://github.com/ncacioni/archon/commit/293290988efa90f43540df8accc53e5c4558a064))
+
 ## [3.3.0](https://github.com/ncacioni/archon/compare/v3.2.0...v3.3.0) (2026-03-29)
 
 ### Features
