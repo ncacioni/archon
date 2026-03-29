@@ -1,3 +1,9 @@
+## [3.3.0](https://github.com/ncacioni/archon/compare/v3.2.0...v3.3.0) (2026-03-29)
+
+### Features
+
+* implement team mode with config-loader and Mode Resolution Protocol ([d14c8e7](https://github.com/ncacioni/archon/commit/d14c8e75939c6a7366f72644f7112f172c83d130))
+
 ## [3.2.0](https://github.com/ncacioni/archon/compare/v3.1.3...v3.2.0) (2026-03-29)
 
 ### Features
