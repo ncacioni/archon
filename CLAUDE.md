@@ -53,11 +53,37 @@ Use these for structured workflows:
 When the user asks you to do something:
 
 1. Determine the intent (build, review, fix, secure, test, deploy, design, data, ml, refactor, frontend)
-2. Use the matching command pipeline, or dispatch agents directly for simple tasks
-3. For ambiguous requests, infer intent from context — do not ask the user to classify
-4. Combine passes when scope is small (a trivial fix doesn't need 8 phases)
-5. For critical security issues, be direct and firm — flag as blockers that must be fixed
-6. When trade-offs exist, present 2-3 options with pros/cons and a recommendation
+2. **Resolve agents through the Mode Resolution Protocol** before spawning
+3. Use the matching command pipeline, or dispatch agents directly for simple tasks
+4. For ambiguous requests, infer intent from context — do not ask the user to classify
+5. Combine passes when scope is small (a trivial fix doesn't need 8 phases)
+6. For critical security issues, be direct and firm — flag as blockers that must be fixed
+7. When trade-offs exist, present 2-3 options with pros/cons and a recommendation
+
+## Mode Resolution Protocol
+
+Before spawning any agent referenced in a command pipeline, resolve the agent name:
+
+1. **Get the task size**: Read `.claude/scratchpad/classification.json` (written by Phase 0 of `/build`) and use the `size` field. If no classification exists (e.g., for `/fix`, `/review`, or direct agent dispatch), omit the `--size` flag.
+2. Run: `node .archon/runtime/config-loader.js resolve <agent-name> --size <task-size>`
+3. Read the JSON output:
+   - `agents`: the agent(s) to actually spawn
+   - `strategy`: how to execute them
+     - `single`: spawn one agent
+     - `sequential`: spawn agents one after another, each receiving the previous agent's scratchpad output
+     - `parallel`: spawn all agents simultaneously
+   - `agents_dir`: where the agent files live (`solo/` or `team/`)
+   - `unavailable`: agents excluded by the active preset (skip silently)
+4. Spawn from the correct directory.
+
+**Examples:**
+- Command says "spawn the **builder**" with mode=solo → `["builder"]`, single, from `.claude/agents/solo/`
+- Command says "spawn the **builder**" with mode=team → `["domain-logic", "app-services", "adapter-layer"]`, sequential, from `.claude/agents/team/`
+- Command says "spawn the **qa**" with mode=team → `["test-engineer", "code-reviewer"]`, parallel, from `.claude/agents/team/`
+
+**If `unavailable` is non-empty**, skip those agents without error. If ALL agents are unavailable, skip the entire phase and note it in the status update.
+
+**Quick check:** `node .archon/runtime/config-loader.js mode` returns the current mode. `node .archon/runtime/config-loader.js agents` returns the active agent list.
 
 ## Repository Structure
 
@@ -94,6 +120,7 @@ node --test __tests__/*.test.js
 | `scout-service.js` | OSS package evaluation cache |
 | `toolkit-loader.js` | Two-level YAML toolkit loading |
 | `maintenance.js` | Toolkit integrity + vulnerability auditing |
+| `config-loader.js` | Mode resolution and solo→team agent expansion |
 | `integrity.js` | Agent/skill/command cross-reference validation |
 
 ## Team Mode (21 agents)

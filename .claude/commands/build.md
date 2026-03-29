@@ -72,6 +72,8 @@ Write to `.claude/scratchpad/security-review.md`.
 
 ### Phase 5: Implementation
 
+Before spawning any implementation agent, resolve it through the **Mode Resolution Protocol** (see CLAUDE.md) using the task size from Phase 0's `.claude/scratchpad/classification.json`. This determines whether to spawn solo agents or team specialists.
+
 Select agent(s) based on affected areas:
 - Backend/API/domain logic → **builder**
 - UI/components/frontend → **frontend**
