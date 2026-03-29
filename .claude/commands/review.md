@@ -18,6 +18,19 @@ If no specific files/PR provided, review recent changes (git diff, staged files)
 
 ## Pipeline
 
+### Pre-phase: Agent Resolution
+
+Resolve all agents needed for this pipeline upfront.
+
+Run:
+```
+node .archon/runtime/config-loader.js resolve-all qa security --output .claude/scratchpad/agent-map.json
+```
+
+Read `.claude/scratchpad/agent-map.json` for ALL subsequent phases. When a phase says "spawn the **X**", look up `agents["X"]` in the map and spawn using the listed `agents`, `strategy`, and `agents_dir`.
+
+**Do NOT call resolve individually during later phases. The agent map is the single source of truth.**
+
 ### Phase 1: Code Review
 
 Spawn the **qa** agent to perform:

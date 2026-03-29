@@ -18,6 +18,16 @@ You are the DevOps agent. You own the full delivery pipeline: CI/CD, observabili
 | **Reference** | Information | OpenAPI spec, config reference |
 | **Explanation** | Understanding | ADRs, architecture rationale |
 
+### README Badges
+Always add shields.io badges at the top of README.md for at-a-glance project health:
+- **Version/Release** — `img.shields.io/github/v/release/...`
+- **License** — `img.shields.io/github/license/...`
+- **CI Status** — `img.shields.io/github/actions/workflow/status/...` (one per workflow)
+- **Language/Runtime** — Node version, Python version, etc.
+- **Key metrics** — test count, coverage, etc.
+
+Center badges in a `<p align="center">` block below the logo and above the title.
+
 ### Structure
 ```
 docs/

@@ -195,6 +195,34 @@ export function resolve(soloName, options = {}) {
   };
 }
 
+/**
+ * Resolve multiple solo agent names in a single call.
+ *
+ * @param {string[]} agentNames - Array of solo agent names to resolve
+ * @param {object} [options={}] - Resolution options (passed to each resolve call)
+ * @param {string} [options.size] - Task size: S, M, L, XL
+ * @returns {{ mode: string, size: string, resolved_at: string, agents: Record<string, object> }}
+ */
+export function resolveAll(agentNames, options = {}) {
+  if (!Array.isArray(agentNames) || agentNames.length === 0) {
+    throw new Error('resolveAll requires a non-empty array of agent names');
+  }
+
+  const mode = getMode();
+  const agents = {};
+
+  for (const name of agentNames) {
+    agents[name] = resolve(name, options);
+  }
+
+  return {
+    mode,
+    size: options.size || null,
+    resolved_at: new Date().toISOString(),
+    agents,
+  };
+}
+
 // CLI interface — guarded
 const _argv1cl = process.argv[1] || '';
 const _metaUrlCl = fileURLToPath(import.meta.url);
@@ -217,8 +245,36 @@ if (_argv1cl.replace(/\\/g, '/') === _metaUrlCl.replace(/\\/g, '/')) {
       options.size = args[sizeIdx + 1];
     }
     console.log(JSON.stringify(resolve(name, options), null, 2));
+  } else if (command === 'resolve-all') {
+    // Parse flags first, then remaining positional args are agent names
+    const options = {};
+    let outputPath = null;
+    const agentNames = [];
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === '--size' && args[i + 1]) {
+        options.size = args[++i];
+      } else if (args[i] === '--output' && args[i + 1]) {
+        outputPath = args[++i];
+      } else {
+        agentNames.push(args[i]);
+      }
+    }
+    if (agentNames.length === 0) {
+      console.error('Usage: node config-loader.js resolve-all <agent1> <agent2> ... [--size S|M|L|XL] [--output path]');
+      process.exit(1);
+    }
+    const result = resolveAll(agentNames, options);
+    const json = JSON.stringify(result, null, 2);
+    if (outputPath) {
+      const dir = path.dirname(outputPath);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(outputPath, json, 'utf-8');
+      console.log(`Agent map written to ${outputPath}`);
+    } else {
+      console.log(json);
+    }
   } else {
     console.log('Archon Config Loader');
-    console.log('Commands: mode, agents, resolve <name> [--size S|M|L|XL]');
+    console.log('Commands: mode, agents, resolve <name> [--size S|M|L|XL], resolve-all <agents...> [--size S|M|L|XL] [--output path]');
   }
 }

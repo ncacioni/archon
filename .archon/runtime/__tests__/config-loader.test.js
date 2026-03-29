@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { loadConfig, getMode, getActiveAgents, resolve } from '../config-loader.js';
+import { loadConfig, getMode, getActiveAgents, resolve, resolveAll } from '../config-loader.js';
 
 describe('config-loader', () => {
   describe('loadConfig()', () => {
@@ -146,6 +146,49 @@ describe('config-loader', () => {
       const config = loadConfig();
       // Verify the conditional structure exists
       assert.ok(config.team.presets['full-stack-app'].agents.includes('ux-researcher'));
+    });
+  });
+
+  describe('resolveAll()', () => {
+    it('returns all requested agents in the agents map', () => {
+      const result = resolveAll(['builder', 'qa', 'security']);
+      assert.ok('agents' in result);
+      assert.ok('builder' in result.agents);
+      assert.ok('qa' in result.agents);
+      assert.ok('security' in result.agents);
+      assert.equal(Object.keys(result.agents).length, 3);
+    });
+
+    it('includes mode, size, and resolved_at', () => {
+      const result = resolveAll(['architect'], { size: 'L' });
+      assert.ok(result.mode === 'solo' || result.mode === 'team');
+      assert.equal(result.size, 'L');
+      assert.ok(typeof result.resolved_at === 'string');
+      // resolved_at should be a valid ISO date
+      assert.ok(!isNaN(Date.parse(result.resolved_at)));
+    });
+
+    it('throws for empty agent names array', () => {
+      assert.throws(() => resolveAll([]), /non-empty array/);
+    });
+
+    it('throws for non-array argument', () => {
+      assert.throws(() => resolveAll(null), /non-empty array/);
+    });
+
+    it('size defaults to null when not provided', () => {
+      const result = resolveAll(['builder']);
+      assert.equal(result.size, null);
+    });
+
+    it('each agent entry matches resolve() output shape', () => {
+      const result = resolveAll(['builder', 'security']);
+      const directResolve = resolve('builder');
+      const fromAll = result.agents['builder'];
+      assert.deepEqual(fromAll.agents, directResolve.agents);
+      assert.equal(fromAll.mode, directResolve.mode);
+      assert.equal(fromAll.strategy, directResolve.strategy);
+      assert.equal(fromAll.agents_dir, directResolve.agents_dir);
     });
   });
 
