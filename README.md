@@ -33,9 +33,16 @@ Use slash commands for structured workflows:
 /data Create Snowflake pipeline for user events
 /ml Build a churn prediction model
 /refactor Extract auth logic into domain service
+/audit Full codebase health check before production
 ```
 
-Or just describe what you need naturally — Archon detects the intent and dispatches the right agents. Use plan mode (`/plan`) for complex features where you want to review the approach before implementation.
+Or just describe what you need naturally — Archon detects the intent and dispatches the right agents.
+
+### Three Ways to Work
+
+- **Slash commands** — `/build`, `/fix`, `/review`, etc. Deterministic pipelines with fixed agent sequences.
+- **Natural language** — "Add JWT auth to the backend." Archon detects the intent and runs the same pipeline.
+- **Plan mode** — `/build Add notifications system` in plan mode. Claude analyzes scope, proposes an approach, and waits for your approval before executing.
 
 ### Commands
 
@@ -55,20 +62,36 @@ Or just describe what you need naturally — Archon detects the intent and dispa
 
 ## Quick Start
 
+### New project
+
 ```bash
-# Initialize Archon in your project (framework files committed to git)
-npx github:ncacioni/archon init
-
-# Or keep framework files local-only (solo developer, not shared)
-npx github:ncacioni/archon init --local
-
-# Upgrade an existing installation to the latest version
-npx github:ncacioni/archon upgrade
-
-# That's it. Open Claude Code and use /build, /fix, /review, etc.
+cd your-project
+npx github:ncacioni/archon init          # shared: framework files committed to git
+npx github:ncacioni/archon init --local  # local: framework files gitignored (solo dev)
 ```
 
-The `init` command scaffolds `.archon/` (runtime, config, toolkits) and `.claude/` (agents, skills, commands, scratchpad). Use `--local` to gitignore all framework files (recommended for solo developers). Then configure permissions — copy Tier 2 into `.claude/settings.local.json` to avoid constant approval popups. See [permission guide](docs/permission-guide.md).
+Then rename `.claude/settings.local.json.example` to `.claude/settings.local.json` to avoid constant approval popups. See [permission guide](docs/permission-guide.md) for tier options.
+
+Open Claude Code and start working:
+```
+/build Add user authentication with JWT and role-based access
+```
+
+Phase 0 classifies your task, evaluates whether solo or team mode fits best, shows you the plan, and asks for confirmation before proceeding.
+
+### Existing project
+
+```bash
+npx github:ncacioni/archon upgrade
+```
+
+Updates framework files (agents, skills, commands, runtime) while preserving your config and CLAUDE.md content. Run `/audit --framework` after upgrading to verify health.
+
+### When to use `--local`
+
+Use `--local` when you're the only developer using Archon on the project. Framework files stay on your machine and don't clutter the repo. CLAUDE.md is still committed (Claude Code needs it).
+
+Use the default (no flag) when your team shares the Archon setup — everyone gets the same agents, skills, and commands.
 
 ## Solo Mode (Default)
 
@@ -94,7 +117,9 @@ Skills provide deep domain knowledge shared across agents:
 
 ## Team Mode (21 Agents)
 
-For larger projects with multiple domains or team members, switch to team mode in `.archon/config.yml`:
+When you run `/build`, Phase 0 automatically evaluates whether your task would benefit from team mode based on size, affected areas, and architecture complexity. If the score is high enough, it recommends switching and shows what would change. You decide.
+
+To switch manually:
 
 ```yaml
 mode: team
