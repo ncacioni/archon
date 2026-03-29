@@ -20,13 +20,11 @@ node_modules/
 .env
 .env.local
 
-# Archon — personal agent memories (not shared)
-.archon/memory/agents/
-.archon/memory/archive/
-!.archon/memory/evaluations.md
-
-# Archon — project state (local only)
+# Archon — local only (not shared)
+.archon/memory/
 .archon/state.json
+.archon/runtime/package-lock.json
 
-# Claude Code — inter-agent scratchpad (ephemeral)
+# Claude Code — local only (not shared)
 .claude/scratchpad/
+.claude/settings.local.json
