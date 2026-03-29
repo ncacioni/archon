@@ -40,6 +40,7 @@ Or just describe what you need naturally — Archon detects the intent and dispa
 | `/ml` | ML workflow: problem framing → model → deploy | ml-engineer → security → qa |
 | `/data` | Data infrastructure: modeling → schema → pipelines → quality | data → security → qa |
 | `/refactor` | Code refactoring with behavioral preservation | architect → builder → qa |
+| `/audit` | Comprehensive codebase audit (security + quality + architecture) | security → qa → architect |
 
 ## Quick Start
 
@@ -104,7 +105,7 @@ cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-59 tests across 6 test suites.
+65 tests across 6 test suites.
 
 ## Core Principles
 
@@ -137,7 +138,7 @@ The devops agent includes semantic-release patterns in its `devops-patterns` ski
   agents/solo/       9 agents with frontmatter (model, tools, skills)
   agents/team/       21 agents for team mode
   skills/            11 reusable domain knowledge skills
-  commands/          10 deterministic workflow entry points
+  commands/          11 deterministic workflow entry points
   scratchpad/        Inter-agent state (gitignored, ephemeral)
 .github/
   workflows/         release.yml (semantic-release) + commitlint.yml (PR validation)

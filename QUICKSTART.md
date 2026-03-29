@@ -51,6 +51,7 @@ node .archon/runtime/maintenance.js audit
 | `/ml` | Problem Framing → Data → Features → Model → Security → MLOps → QA |
 | `/data` | Scope → Modeling → Schema/Migration → Pipeline → Security → Quality → QA |
 | `/refactor` | Analysis → Refactoring Plan → Incremental Implementation → Verification |
+| `/audit` | Security Audit → Quality Audit → Architecture Audit → Consolidated P0/P1/P2 Report |
 
 ## Solo Agents
 

@@ -39,6 +39,7 @@ Use these for structured workflows:
 | `/ml` | ML workflow: problem framing → data → features → model → deploy | ml-engineer → security → qa |
 | `/data` | Data infrastructure: modeling → schema → migrations → pipelines → quality | data → security → qa |
 | `/refactor` | Code refactoring with behavioral preservation | architect → builder → qa |
+| `/audit` | Comprehensive codebase audit (security + quality + architecture) | security → qa → architect |
 
 ## Core Invariants
 
@@ -92,7 +93,7 @@ Before spawning any agent referenced in a command pipeline, resolve the agent na
   agents/solo/       9 agents with frontmatter (model, tools, skills)
   agents/team/       21 agents for team mode
   skills/            11 reusable domain knowledge skills
-  commands/          10 deterministic workflow entry points
+  commands/          11 deterministic workflow entry points
   scratchpad/        Inter-agent state (gitignored, ephemeral)
   settings.json      Claude Code settings
 docs/                Framework documentation and guides

@@ -38,6 +38,26 @@ Write classification to `.claude/scratchpad/classification.json`:
 }
 ```
 
+**After classification, report to the user:**
+- Task size and reasoning
+- Current mode (run `node .archon/runtime/config-loader.js mode`)
+- Agents that will be used and phases that will run
+- If mode is `solo` and size is M or larger, note that team mode is available and what it would expand (e.g., "builder would expand to domain-logic → app-services → adapter-layer"). Let the user decide whether to switch.
+- If the user asks to change mode, update `.archon/config.yml` and re-resolve.
+
+### Pre-phase: Agent Resolution
+
+Using the `agents_needed` and `size` from Phase 0's `.claude/scratchpad/classification.json`, resolve all agents upfront. Always include `architect`, `spec-writer`, `security`, `qa`, and `devops` in addition to the agents listed in `agents_needed`.
+
+Run:
+```
+node .archon/runtime/config-loader.js resolve-all <agents_needed + architect spec-writer security qa devops> --size <size> --output .claude/scratchpad/agent-map.json
+```
+
+Read `.claude/scratchpad/agent-map.json` for ALL subsequent phases. When a phase says "spawn the **X**", look up `agents["X"]` in the map and spawn using the listed `agents`, `strategy`, and `agents_dir`.
+
+**Do NOT call resolve individually during later phases. The agent map is the single source of truth.**
+
 ### Phase 1: Analysis
 
 Explore the codebase to understand current state. Read relevant files, check existing patterns, identify integration points. Write findings to `.claude/scratchpad/analysis.md`.
