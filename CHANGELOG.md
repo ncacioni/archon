@@ -1,3 +1,9 @@
+## [4.1.0](https://github.com/ncacioni/archon/compare/v4.0.0...v4.1.0) (2026-03-29)
+
+### Features
+
+* add --local flag, archon upgrade command, and auto mode evaluation ([9672531](https://github.com/ncacioni/archon/commit/9672531541fa910241a66a7d55cc4db7e8328a00))
+
 ## [3.4.0](https://github.com/ncacioni/archon/compare/v3.3.0...v3.4.0) (2026-03-29)
 
 ### ⚠ BREAKING CHANGES
