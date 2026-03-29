@@ -2,6 +2,17 @@
   <img src="assets/archon-logo.png" alt="Archon Logo" width="250">
 </p>
 
+<p align="center">
+  <a href="https://github.com/ncacioni/archon/releases"><img src="https://img.shields.io/github/v/release/ncacioni/archon?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/ncacioni/archon/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ncacioni/archon?style=flat-square" alt="License"></a>
+  <a href="https://github.com/ncacioni/archon/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/ncacioni/archon/release.yml?style=flat-square&label=release" alt="Release"></a>
+  <a href="https://github.com/ncacioni/archon/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/ncacioni/archon/codeql.yml?style=flat-square&label=CodeQL" alt="CodeQL"></a>
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="Node">
+  <img src="https://img.shields.io/badge/agents-9%20solo%20%7C%2021%20team-purple?style=flat-square" alt="Agents">
+  <img src="https://img.shields.io/badge/commands-11-orange?style=flat-square" alt="Commands">
+  <img src="https://img.shields.io/badge/tests-65%20passing-brightgreen?style=flat-square" alt="Tests">
+</p>
+
 # Archon — Intelligent Orchestrator for Claude Code
 
 Archon is a scalable agent orchestration framework for Claude Code. It uses Claude Code's native `.claude/` system — agents with frontmatter, skills, commands, and scratchpad — to provide deterministic, multi-agent workflows with proper model tiering and tool scoping.
