@@ -1,3 +1,9 @@
+## [3.2.0](https://github.com/ncacioni/archon/compare/v3.1.3...v3.2.0) (2026-03-29)
+
+### Features
+
+* self-audit improvements — fix 10 failing tests, revive toolkit system, harden security ([ef04a06](https://github.com/ncacioni/archon/commit/ef04a0621ffa15620212bb362b371c20226d6471))
+
 ## [3.1.3](https://github.com/ncacioni/archon/compare/v3.1.2...v3.1.3) (2026-03-29)
 
 ### Bug Fixes
