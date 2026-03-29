@@ -96,6 +96,7 @@ Archon includes a Node.js runtime (ES modules, `js-yaml` as only dependency):
 | `scout-service.js` | OSS package evaluation cache |
 | `toolkit-loader.js` | Two-level YAML toolkit loading |
 | `maintenance.js` | Toolkit integrity + vulnerability auditing |
+| `config-loader.js` | Mode resolution and solo→team agent expansion |
 | `integrity.js` | Agent/skill/command cross-reference validation |
 
 ```bash
@@ -103,7 +104,7 @@ cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-40 tests across 5 test suites.
+59 tests across 6 test suites.
 
 ## Core Principles
 
@@ -143,7 +144,7 @@ The devops agent includes semantic-release patterns in its `devops-patterns` ski
 docs/                Framework documentation
 bin/                 CLI (npx github:ncacioni/archon init)
 .archon/
-  runtime/           5 modules + test suite
+  runtime/           6 modules + test suite
   toolkits/          Agent toolkit indices + tool definitions (YAML)
   config.yml         Project configuration
 ```
