@@ -1,3 +1,9 @@
+## [3.1.3](https://github.com/ncacioni/archon/compare/v3.1.2...v3.1.3) (2026-03-29)
+
+### Bug Fixes
+
+* remove legacy toolkit indexes and clean up gitignore ([6324807](https://github.com/ncacioni/archon/commit/6324807dbf3807187293fb26baa0c1cc3370040c))
+
 ## [3.1.2](https://github.com/ncacioni/archon/compare/v3.1.1...v3.1.2) (2026-03-29)
 
 ### Bug Fixes
