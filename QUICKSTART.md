@@ -136,8 +136,8 @@ After `npx github:ncacioni/archon init`, your `.gitignore` is updated automatica
 | `.claude/scratchpad/` | Ephemeral inter-agent artifacts |
 | `.claude/settings.local.json` | Personal permission tier |
 | `.archon/state.json` | Local feature progress tracking |
-| `.archon/memory/agents/` | Agent decision memories |
-| `.archon/memory/archive/` | Archived agent data |
+| `.archon/memory/` | Agent memories and evaluation cache |
+| `.archon/runtime/package-lock.json` | Runtime dependency lock (local) |
 
 ## Permission Setup
 
@@ -168,7 +168,9 @@ After init, create `.claude/settings.local.json` with the **Tier 2 (Developer)**
       "Bash(jq *)", "Bash(sort *)", "Bash(diff *)", "Bash(test *)",
       "Bash(mkdir *)", "Bash(cp *)", "Bash(mv *)", "Bash(touch *)", "Bash(rm *)",
       "Bash(docker ps*)", "Bash(docker logs*)",
-      "Bash(* --version)", "Bash(* --help)", "Bash(* --help *)"
+      "Bash(node --version)", "Bash(npm --version)",
+      "Bash(python --version)", "Bash(python3 --version)",
+      "Bash(git --version)", "Bash(docker --version)"
     ],
     "ask": [
       "Bash(git push *)", "Bash(git merge *)", "Bash(git rebase *)",

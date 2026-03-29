@@ -5,7 +5,7 @@ import { loadIndex, loadTool, listTools } from '../toolkit-loader.js';
 describe('toolkit-loader', () => {
   describe('loadIndex()', () => {
     it('returns YAML string for existing agent toolkit', () => {
-      const result = loadIndex('08-security-architect');
+      const result = loadIndex('security');
       assert.ok(result.includes('stride-analysis'));
       assert.ok(result.includes('npm-audit-check'));
     });
@@ -32,7 +32,7 @@ describe('toolkit-loader', () => {
 
   describe('listTools()', () => {
     it('returns array of tool summaries for an agent', () => {
-      const tools = listTools('08-security-architect');
+      const tools = listTools('security');
       assert.ok(Array.isArray(tools));
       assert.equal(tools.length, 5);
       assert.equal(tools[0].id, 'stride-analysis');
@@ -45,15 +45,17 @@ describe('toolkit-loader', () => {
     });
   });
 
-  // Task 6 tests — will fail until all toolkit files created
   describe('all agent toolkits', () => {
     const expectedToolkits = [
-      { agent: '02-requirements-architect', toolCount: 3 },
-      { agent: '05-data-architect', toolCount: 3 },
-      { agent: '06-integration-architect', toolCount: 3 },
-      { agent: '15-frontend-architect', toolCount: 3 },
-      { agent: '17-test-architect', toolCount: 3 },
-      { agent: '25-innovation-scout', toolCount: 4 },
+      { agent: 'architect', toolCount: 4 },
+      { agent: 'security', toolCount: 5 },
+      { agent: 'spec-writer', toolCount: 3 },
+      { agent: 'builder', toolCount: 3 },
+      { agent: 'frontend', toolCount: 3 },
+      { agent: 'qa', toolCount: 3 },
+      { agent: 'devops', toolCount: 3 },
+      { agent: 'data', toolCount: 8 },
+      { agent: 'ml-engineer', toolCount: 3 },
     ];
 
     for (const { agent, toolCount } of expectedToolkits) {
@@ -64,7 +66,7 @@ describe('toolkit-loader', () => {
     }
 
     it('every tool referenced in an index has a corresponding .tool.yml file', () => {
-      const agents = ['02-requirements-architect', '05-data-architect', '06-integration-architect', '08-security-architect', '15-frontend-architect', '17-test-architect', '25-innovation-scout'];
+      const agents = ['architect', 'security', 'spec-writer', 'builder', 'frontend', 'qa', 'devops', 'data', 'ml-engineer'];
       for (const agent of agents) {
         const tools = listTools(agent);
         for (const tool of tools) {

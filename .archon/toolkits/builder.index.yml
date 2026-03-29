@@ -1,0 +1,8 @@
+agent: "builder"
+tools:
+  - id: api-contract-template
+    description: "API contract template with endpoints, auth, errors, pagination"
+  - id: migration-template
+    description: "Database migration template with up/down, rollback plan"
+  - id: breaking-change-detector
+    description: "Detect breaking changes in API contracts"

@@ -1,0 +1,12 @@
+agent: "security"
+tools:
+  - id: stride-analysis
+    description: "STRIDE threat model template with per-component analysis"
+  - id: owasp-checklist
+    description: "OWASP Top 10 verification checklist"
+  - id: controls-matrix
+    description: "Security controls matrix mapping threats to mitigations"
+  - id: cve-lookup
+    description: "CVE database lookup for known vulnerabilities"
+  - id: npm-audit-check
+    description: "npm audit wrapper for dependency vulnerability scanning"

@@ -16,7 +16,7 @@ const ROOT = path.resolve(import.meta.dirname, '..', '..');
  * Returns an object with extracted fields.
  */
 export function parseFrontmatter(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = fs.readFileSync(filePath, 'utf-8').replace(/\r\n/g, '\n');
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return {};
 

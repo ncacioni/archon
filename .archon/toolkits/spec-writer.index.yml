@@ -1,0 +1,8 @@
+agent: "spec-writer"
+tools:
+  - id: user-story-template
+    description: "Structured user story template with acceptance criteria"
+  - id: acceptance-criteria-generator
+    description: "Generate acceptance criteria from requirements"
+  - id: schema-validator
+    description: "Validate database schema DDL for consistency"

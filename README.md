@@ -103,7 +103,7 @@ cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-37 tests across 5 test suites.
+40 tests across 5 test suites.
 
 ## Core Principles
 

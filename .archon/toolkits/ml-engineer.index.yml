@@ -1,0 +1,8 @@
+agent: "ml-engineer"
+tools:
+  - id: package-evaluator
+    description: "Evaluate ML/data packages for quality, maintenance, and security"
+  - id: npm-search
+    description: "Search package registries for ML/data libraries"
+  - id: github-search
+    description: "Search GitHub for ML repos, examples, and benchmarks"
