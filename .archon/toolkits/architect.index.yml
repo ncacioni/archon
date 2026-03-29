@@ -1,0 +1,10 @@
+agent: "architect"
+tools:
+  - id: api-contract-template
+    description: "API contract template with endpoints, auth, errors, pagination"
+  - id: erd-generator
+    description: "Generate Entity-Relationship Diagram from domain model"
+  - id: openapi-validator
+    description: "Validate OpenAPI spec completeness and consistency"
+  - id: requirement-classifier
+    description: "Classify requirements by size (S/M/L/XL) and affected areas"

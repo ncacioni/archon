@@ -1,0 +1,8 @@
+agent: "devops"
+tools:
+  - id: pipeline-contract
+    description: "CI/CD pipeline contract template with stages and gates"
+  - id: breaking-change-detector
+    description: "Detect breaking changes in API contracts"
+  - id: license-checker
+    description: "Check dependency licenses for compliance"

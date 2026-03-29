@@ -135,9 +135,9 @@ Create `.claude/settings.local.json`:
       "Bash(sort *)",
       "Bash(diff *)",
       "Bash(test *)",
-      "Bash(* --version)",
-      "Bash(* --help)",
-      "Bash(* --help *)"
+      "Bash(node --version)", "Bash(npm --version)",
+      "Bash(python --version)", "Bash(python3 --version)",
+      "Bash(git --version)", "Bash(docker --version)"
     ],
     "ask": [
       "Write",
@@ -238,9 +238,9 @@ Create `.claude/settings.local.json`:
       "Bash(rm *)",
       "Bash(docker ps*)",
       "Bash(docker logs*)",
-      "Bash(* --version)",
-      "Bash(* --help)",
-      "Bash(* --help *)"
+      "Bash(node --version)", "Bash(npm --version)",
+      "Bash(python --version)", "Bash(python3 --version)",
+      "Bash(git --version)", "Bash(docker --version)"
     ],
     "ask": [
       "Bash(git push *)",

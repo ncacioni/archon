@@ -1,0 +1,18 @@
+agent: "data"
+tools:
+  - id: erd-generator
+    description: "Generate Entity-Relationship Diagram from domain model"
+  - id: migration-template
+    description: "Database migration template with up/down, rollback plan"
+  - id: schema-validator
+    description: "Validate database schema DDL for consistency"
+  - id: dbt-model-template
+    description: "Generate dbt model with staging/intermediate/mart layering"
+  - id: dbt-test-template
+    description: "Generate dbt test definitions for data quality"
+  - id: airflow-dag-template
+    description: "Generate Airflow DAG template with best practices"
+  - id: snowflake-schema-template
+    description: "Snowflake schema template with clustering and access control"
+  - id: pipeline-contract
+    description: "Data pipeline contract template with SLAs and quality gates"

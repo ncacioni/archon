@@ -136,7 +136,9 @@ function scaffoldSettingsExample(cwd) {
         "Bash(jq *)", "Bash(sort *)", "Bash(diff *)", "Bash(test *)",
         "Bash(mkdir *)", "Bash(cp *)", "Bash(mv *)", "Bash(touch *)", "Bash(rm *)",
         "Bash(docker ps*)", "Bash(docker logs*)",
-        "Bash(* --version)", "Bash(* --help)", "Bash(* --help *)"
+        "Bash(node --version)", "Bash(npm --version)",
+        "Bash(python --version)", "Bash(python3 --version)",
+        "Bash(git --version)", "Bash(docker --version)"
       ],
       ask: [
         "Bash(git push *)", "Bash(git merge *)", "Bash(git rebase *)",
@@ -173,8 +175,8 @@ function updateGitignore(cwd) {
   const entries = [
     '# Archon — local only (not shared)',
     '.archon/state.json',
-    '.archon/memory/agents/',
-    '.archon/memory/archive/',
+    '.archon/memory/',
+    '.archon/runtime/package-lock.json',
     '',
     '# Claude Code — local only (not shared)',
     '.claude/scratchpad/',

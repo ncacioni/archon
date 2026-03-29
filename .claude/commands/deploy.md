@@ -52,7 +52,19 @@ Pre-commit → Build → Test → Security → Container → Staging → Product
 - GitOps principles
 - Supply chain security (pin deps, SBOM, SLSA Level 2+)
 
-### Phase 3: Documentation
+### Phase 3: Security Review
+
+Spawn the **security** agent to review deployment artifacts:
+- Scan pipeline configs for hardcoded secrets or tokens
+- Verify container images use non-root user and minimal base
+- Check IaC for excessive IAM permissions
+- Validate no secrets in environment variables or code
+
+**If security agent flags VETO triggers → STOP. Report blockers to user.**
+
+Write to `.claude/scratchpad/security-review.md`.
+
+### Phase 4: Documentation
 
 Update relevant docs:
 - Runbooks (WHEN → STEPS → VERIFY → ROLLBACK → ESCALATE)
@@ -67,7 +79,8 @@ After each phase completes, report a concise status update to the user:
 
 - **Phase 1**: Report current deployment state assessment (what exists, what's missing, what needs change)
 - **Phase 2**: Report what was implemented (pipeline stages, Docker config, release artifacts, infra changes)
-- **Phase 3**: Report documentation updates (runbooks created, README changes, env config)
+- **Phase 3**: Report security findings — blockers halt the pipeline, advisories are listed
+- **Phase 4**: Report documentation updates (runbooks created, README changes, env config)
 
 ## Rules
 
