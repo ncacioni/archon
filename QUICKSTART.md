@@ -187,6 +187,17 @@ If you ran `npx github:ncacioni/archon init`, you can also rename `.claude/setti
 
 For other tiers (Conservative, Autonomous) and customization options, see [docs/permission-guide.md](docs/permission-guide.md).
 
+## Recommended: Codebase Memory MCP
+
+For better codebase understanding, install [codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) globally. It builds a knowledge graph of your code that agents can query for:
+
+- **Call path tracing** — "who calls this function?"
+- **Impact analysis** — "what breaks if I change X?"
+- **Dead code detection** — find unused functions
+- **Architecture exploration** — understand code structure
+
+Install it as an MCP server in your global Claude Code settings (`~/.claude/settings.json`). It's a personal tool — not committed to the repo, index is per-project.
+
 ## Tips
 
 1. **Just describe what you need** — No need to pick agents or phases manually
