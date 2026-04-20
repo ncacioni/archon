@@ -1,3 +1,14 @@
+## [4.2.0](https://github.com/ncacioni/archon/compare/v4.1.0...v4.2.0) (2026-04-20)
+
+### Features
+
+* add 5 runtime modules inspired by VANTAGE analysis ([7437495](https://github.com/ncacioni/archon/commit/7437495c6d176856a680ab058827a3363509581f))
+* add v5 features — session continuity, hooks, swarm review, handoff schemas ([9ee8815](https://github.com/ncacioni/archon/commit/9ee88152d6d5061f868776cd95c099a66de04886))
+
+### Bug Fixes
+
+* improve pre-bash hook npm publish pattern to avoid false positives in heredocs ([c39faf2](https://github.com/ncacioni/archon/commit/c39faf27fa5430ac281f748b41606b675785b6ab))
+
 ## [4.1.0](https://github.com/ncacioni/archon/compare/v4.0.0...v4.1.0) (2026-03-29)
 
 ### Features
