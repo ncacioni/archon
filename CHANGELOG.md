@@ -1,3 +1,9 @@
+## [4.3.0](https://github.com/ncacioni/archon/compare/v4.2.0...v4.3.0) (2026-04-20)
+
+### Features
+
+* add trace.js post-execution observability with JSONL traces ([c32f4ca](https://github.com/ncacioni/archon/commit/c32f4cacfb55a434755e218647af564601b3c0a0))
+
 ## [4.2.0](https://github.com/ncacioni/archon/compare/v4.1.0...v4.2.0) (2026-04-20)
 
 ### Features
