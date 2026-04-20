@@ -266,6 +266,39 @@ function scaffoldSettingsExample(cwd) {
         "Bash(docker compose*)", "Bash(docker exec *)",
         "Bash(docker build *)", "Bash(docker run *)"
       ]
+    },
+    hooks: {
+      SessionStart: [
+        {
+          hooks: [
+            {
+              type: "command",
+              command: "node .archon/runtime/session-continuity.js read --brief 2>/dev/null || true"
+            }
+          ]
+        }
+      ],
+      Stop: [
+        {
+          hooks: [
+            {
+              type: "command",
+              command: "node .archon/runtime/session-lock.js check --quiet 2>/dev/null || true"
+            }
+          ]
+        }
+      ],
+      PreToolUse: [
+        {
+          matcher: "Bash",
+          hooks: [
+            {
+              type: "command",
+              command: "node .archon/runtime/hooks/pre-bash.js"
+            }
+          ]
+        }
+      ]
     }
   };
   fs.writeFileSync(examplePath, JSON.stringify(tier2Config, null, 2) + '\n', 'utf-8');
@@ -312,6 +345,7 @@ function updateGitignore(cwd, local = false) {
       '.archon/memory/',
       '.archon/runtime/package-lock.json',
       '.archon/install-mode.json',
+      'SESSION.md',
       '',
       '# Claude Code — local only (not shared)',
       '.claude/scratchpad/',

@@ -123,6 +123,78 @@ node --test __tests__/*.test.js
 | `maintenance.js` | Toolkit integrity + vulnerability auditing |
 | `config-loader.js` | Mode resolution and solo→team agent expansion |
 | `integrity.js` | Agent/skill/command cross-reference validation |
+| `token-estimator.js` | Pre-execution token cost estimates per phase |
+| `fast-path.js` | Deterministic code transforms without LLM invocation |
+| `session-lock.js` | Pipeline checkpoint and crash recovery |
+| `drift-detector.js` | Spec-to-code divergence detection |
+| `rag-manager.js` | TF-IDF search over agent memory files |
+| `session-continuity.js` | SESSION.md writer for cross-session context (start/update/complete) |
+| `handoff.js` | Structured inter-agent contracts with JSON Schema validation |
+| `hooks/pre-bash.js` | PreToolUse hook — blocks dangerous Bash commands (npm publish, DROP TABLE, etc.) |
+
+## Fast-Path Transforms
+
+For mechanical code changes, use `fast-path.js` instead of spawning an agent. This saves ~2000 tokens per operation.
+
+**When to use fast-path (detect these intents automatically):**
+
+| User says | Fast-path command |
+|-----------|------------------|
+| "remove all console.logs", "clean up console statements" | `node .archon/runtime/fast-path.js remove-console <file-or-dir>` |
+| "convert var to const/let", "fix var declarations" | `node .archon/runtime/fast-path.js var-to-const <file-or-dir>` |
+| "sort imports", "organize import statements" | `node .archon/runtime/fast-path.js sort-imports <file-or-dir>` |
+| "normalize quotes", "use single quotes everywhere" | `node .archon/runtime/fast-path.js normalize-quotes <file-or-dir>` |
+| "add use strict", "add strict mode" | `node .archon/runtime/fast-path.js add-strict <file-or-dir>` |
+| "remove unused variables", "clean unused vars" | `node .archon/runtime/fast-path.js remove-unused-vars <file-or-dir>` |
+
+Use `--dry-run` to preview changes before applying. Fast-path works on individual files or whole directories.
+
+## Agent Memory (RAG)
+
+Before loading large agent memory files into context, search for relevant chunks:
+
+```bash
+node .archon/runtime/rag-manager.js search <agent> "<query>" --top 3
+```
+
+**When to use:** When an agent has accumulated memory files in `.archon/memory/` and you need context about a specific topic (e.g., previous architectural decisions, past security findings, package evaluations).
+
+This reduces memory token cost by 40-90% by loading only relevant chunks instead of entire files.
+
+## Session Continuity
+
+When starting a session, Claude Code automatically reads `SESSION.md` from the project root (if it exists). If present, check its status and ask the user whether to continue or start fresh.
+
+**Managed by `session-continuity.js`:**
+
+```bash
+node .archon/runtime/session-continuity.js start <command> "<description>"
+node .archon/runtime/session-continuity.js update <command> <phase> "<summary>"
+node .archon/runtime/session-continuity.js complete-phase <command> <phase> "<summary>"
+node .archon/runtime/session-continuity.js decision <command> "<what>" "<why>"
+node .archon/runtime/session-continuity.js complete [--clear]
+node .archon/runtime/session-continuity.js read [--brief]
+```
+
+The `/build` command calls these automatically at each phase. `SESSION.md` is gitignored (local session state).
+
+## Structured Handoffs
+
+Inter-agent contracts are validated against JSON Schemas in `.archon/runtime/schemas/`:
+
+| Schema | Handoff |
+|--------|---------|
+| `spec-complete` | spec-writer → security |
+| `security-approval` | security → builder |
+| `implementation-complete` | builder → qa |
+| `qa-approval` | qa → devops |
+
+```bash
+node .archon/runtime/handoff.js validate <schema-name> <json-file>
+node .archon/runtime/handoff.js write <schema-name> <json-file>
+node .archon/runtime/handoff.js read <schema-name>
+node .archon/runtime/handoff.js schemas
+```
 
 ## Team Mode (21 agents)
 

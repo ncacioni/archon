@@ -31,45 +31,59 @@ Read `.claude/scratchpad/agent-map.json` for ALL subsequent phases. When a phase
 
 **Do NOT call resolve individually during later phases. The agent map is the single source of truth.**
 
-### Phase 1: Code Review
+### Phase 1: Swarm Review (5 reviewers in parallel)
 
-Spawn the **qa** agent to perform:
-- Clean Architecture compliance (dependency direction check)
-- Code quality (complexity, duplication, naming, error handling)
-- Test coverage assessment
-- SAST quality gate checks
+Spawn 5 reviewers **simultaneously** using the **qa** and **security** agents with specialized prompts. Each reviewer writes its findings to a dedicated scratchpad file.
 
-Write findings to `.claude/scratchpad/qa-review.md`.
+| Reviewer | Agent | Scope | Output |
+|----------|-------|-------|--------|
+| **security-reviewer** | security | STRIDE threat model, OWASP Top 10, veto triggers (hardcoded secrets, injection, auth bypass, deprecated crypto) | `.claude/scratchpad/review-security.md` |
+| **performance-reviewer** | qa | N+1 queries, algorithmic complexity (O(n²)+), unnecessary I/O, bundle size regressions | `.claude/scratchpad/review-performance.md` |
+| **architecture-reviewer** | qa | Clean Architecture compliance (dependency direction), layer violations, coupling, cohesion | `.claude/scratchpad/review-architecture.md` |
+| **test-reviewer** | qa | Coverage gaps, missing edge cases, test pyramid balance, missing regression tests | `.claude/scratchpad/review-tests.md` |
+| **quality-reviewer** | qa | Code smell, duplication, naming clarity, cyclomatic complexity, error handling completeness | `.claude/scratchpad/review-quality.md` |
 
-### Phase 2: Security Review
+**Parallelism**: spawn all 5 simultaneously. Each receives only its specific scope — do not give a reviewer the full review brief.
 
-Spawn the **security** agent to perform:
-- STRIDE threat modeling on changed components
-- OWASP Top 10 check
-- Veto trigger scan (hardcoded secrets, injection, auth bypass, deprecated crypto)
-- Advisory findings with severity levels
+Report after all 5 complete: how many findings each reviewer flagged, any blockers found.
 
-Write findings to `.claude/scratchpad/security-review.md`.
+### Phase 2: Consolidation
 
-### Phase 3: Summary
+Read all 5 scratchpad files and consolidate findings into a single report:
 
-Present consolidated review with:
-- **Blockers** (must fix before shipping)
-- **High** (should fix)
-- **Medium/Low** (advisory)
-- Each finding: file, line, severity, category, description, suggested fix
+1. **Deduplicate**: if multiple reviewers flag the same issue, merge them into one finding
+2. **Classify severity**: P0 (blocker, must fix), P1 (should fix), P2 (advisory)
+3. **Sort by severity**: P0 first, then P1, then P2
+4. **Attribute**: note which reviewer(s) caught each finding
 
-## Progress Reporting
+Write consolidated report to `.claude/scratchpad/review-consolidated.md`.
 
-After each phase completes, report a concise status update to the user:
+### Phase 3: Present Report
 
-- **Phase 1**: Report QA findings summary (number of issues by severity, key patterns found)
-- **Phase 2**: Report security findings summary (blockers, high/medium/low counts, critical items)
-- **Phase 3**: Present consolidated review — this IS the final output to the user
+Present the consolidated findings to the user:
+
+**Format:**
+```
+## Review Results
+
+### P0 — Blockers (must fix before shipping)
+- [SECURITY/ARCH/etc] filename:line — description — fix suggestion
+
+### P1 — Should Fix
+- ...
+
+### P2 — Advisory
+- ...
+
+### Summary
+5 reviewers × parallel — N total findings (X P0, Y P1, Z P2)
+Security veto: YES/NO
+```
 
 ## Rules
 
 - Be concrete: provide file paths, line numbers, and fix suggestions
-- Security veto triggers are always blockers — no exceptions
-- Architecture violations (inner layer importing outer) are always flagged
+- Security veto triggers are always P0 — no exceptions
+- Architecture violations (inner layer importing outer) are always P0
 - Present findings by severity, not by agent
+- If all 5 reviewers find no issues, say so explicitly — that IS a valid result

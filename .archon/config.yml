@@ -65,3 +65,11 @@ scout:
 maintenance:
   auto_trigger_days: 30
   cve_sources: [npm-audit, github-advisories]
+
+drift:
+  threshold: 0.2   # 0.0–1.0 — warn if drift signals exceed this fraction of spec entries
+  signals:
+    - missing_ref   # spec route not found in source code
+    - orphaned_spec # spec schema with no code type
+    - scope_creep   # code route with no spec entry
+    - naming        # identifier naming mismatch between spec and code

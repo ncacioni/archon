@@ -64,12 +64,25 @@ Write classification to `.claude/scratchpad/classification.json`:
 }
 ```
 
-4. Report to the user:
+4. Get token estimate for this pipeline:
+   ```
+   node .archon/runtime/token-estimator.js estimate --size <size> --command build
+   ```
+   Include the estimate table in the report to the user.
+
+5. Report to the user:
    - Task size, reasoning, affected areas, phases that will run
+   - Token estimate per phase (from step 4)
    - Current mode and agents that will be used
    - **If score >= 40**: show the score, signals, and what team mode would expand. Let the user decide.
    - **If score < 40**: just show the current mode, no recommendation
    - If the user says "switch to team mode", update `.archon/config.yml` and re-resolve.
+
+6. Write initial session checkpoint and start session continuity:
+   ```
+   node .archon/runtime/session-lock.js write build phase-0
+   node .archon/runtime/session-continuity.js start build "$ARGUMENTS"
+   ```
 
 ### Pre-phase: Agent Resolution
 
@@ -90,6 +103,10 @@ Explore the codebase to understand current state. Read relevant files, check exi
 
 ### Phase 2: Architecture (L/XL only)
 
+```
+node .archon/runtime/session-continuity.js update build phase-2 "Architecture design (ADD)"
+```
+
 Spawn the **architect** agent. Produce an ADD (Architectural Design Document) with:
 1. Context & Problem Statement
 2. Decision Drivers
@@ -106,6 +123,10 @@ Write to `.claude/scratchpad/add.md`.
 
 ### Phase 3: Specification (M/L/XL)
 
+```
+node .archon/runtime/session-continuity.js update build phase-3 "Specification (OpenAPI/schema)"
+```
+
 Spawn the **spec-writer** agent. Produce specs appropriate to the feature (OpenAPI, DB schema, domain model, etc.). Write to `.claude/scratchpad/spec.md`.
 
 ### Phase 4: Security Review
@@ -117,6 +138,10 @@ Spawn the **security** agent. Review the ADD and/or specs for security issues us
 Write to `.claude/scratchpad/security-review.md`.
 
 ### Phase 5: Implementation
+
+```
+node .archon/runtime/session-continuity.js update build phase-5 "Implementation"
+```
 
 Before spawning any implementation agent, resolve it through the **Mode Resolution Protocol** (see CLAUDE.md) using the task size from Phase 0's `.claude/scratchpad/classification.json`. This determines whether to spawn solo agents or team specialists.
 
@@ -137,13 +162,29 @@ Implement according to specs and ADD. Write implementation log to `.claude/scrat
 
 ### Phase 6: QA
 
+Before spawning QA, run drift detection:
+```
+node .archon/runtime/drift-detector.js check
+```
+If drift is detected (exit code 1), report the signals to the user and include them in the QA scope. This does NOT block QA — it informs it.
+
 Spawn the **qa** agent. Run tests, code review, architecture compliance check.
 
 **If QA fails → loop back to Phase 5 (max 3 iterations). After 3 failures, escalate to user.**
 
 Write to `.claude/scratchpad/qa-review.md`.
 
+After QA completes:
+```
+node .archon/runtime/session-lock.js complete build phase-6
+node .archon/runtime/session-continuity.js complete-phase build phase-6 "QA passed"
+```
+
 ### Phase 7: Documentation (M/L/XL)
+
+```
+node .archon/runtime/session-continuity.js complete build --clear
+```
 
 Spawn the **devops** agent. Produce PR summary, update relevant docs, changelog entry if needed. Write to `.claude/scratchpad/pr-summary.md`.
 

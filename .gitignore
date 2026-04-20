@@ -23,7 +23,9 @@ node_modules/
 # Archon — local only (not shared)
 .archon/memory/
 .archon/state.json
+.archon/session.json
 .archon/runtime/package-lock.json
+SESSION.md
 
 # Claude Code — local only (not shared)
 .claude/scratchpad/
