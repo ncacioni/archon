@@ -5,7 +5,7 @@
 import { createInterface } from 'node:readline';
 
 const BLOCKED_PATTERNS = [
-  { pattern: /\bnpm\s+publish\b/, reason: 'npm publish blocked — use CI/CD pipeline for releases' },
+  { pattern: /(?:^|&&|\|\||;\s*|\|\s*)(?:\s*(?:cd\s+\S+\s*&&\s*)?)npm\s+publish\b/, reason: 'npm publish blocked — use CI/CD pipeline for releases' },
   { pattern: /\bDROP\s+TABLE\b/i, reason: 'DROP TABLE blocked — destructive database operation requires manual execution' },
   { pattern: /\bDROP\s+DATABASE\b/i, reason: 'DROP DATABASE blocked — destructive database operation requires manual execution' },
   { pattern: /\bsudo\s+rm\b/, reason: 'sudo rm blocked — use targeted file removal without sudo' },

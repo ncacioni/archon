@@ -67,6 +67,11 @@ describe('pre-bash hook', () => {
       assert.equal(r.blocked, false);
     });
 
+    it('allows gh pr with npm publish in body text', () => {
+      const r = check('gh pr edit --body "text about npm publish here"');
+      assert.equal(r.blocked, false);
+    });
+
     it('allows git push without --force', () => {
       const r = check('git push origin main');
       assert.equal(r.blocked, false);
