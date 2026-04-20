@@ -128,6 +128,9 @@ node --test __tests__/*.test.js
 | `session-lock.js` | Pipeline checkpoint and crash recovery |
 | `drift-detector.js` | Spec-to-code divergence detection |
 | `rag-manager.js` | TF-IDF search over agent memory files |
+| `session-continuity.js` | SESSION.md writer for cross-session context (start/update/complete) |
+| `handoff.js` | Structured inter-agent contracts with JSON Schema validation |
+| `hooks/pre-bash.js` | PreToolUse hook — blocks dangerous Bash commands (npm publish, DROP TABLE, etc.) |
 
 ## Fast-Path Transforms
 
@@ -157,6 +160,41 @@ node .archon/runtime/rag-manager.js search <agent> "<query>" --top 3
 **When to use:** When an agent has accumulated memory files in `.archon/memory/` and you need context about a specific topic (e.g., previous architectural decisions, past security findings, package evaluations).
 
 This reduces memory token cost by 40-90% by loading only relevant chunks instead of entire files.
+
+## Session Continuity
+
+When starting a session, Claude Code automatically reads `SESSION.md` from the project root (if it exists). If present, check its status and ask the user whether to continue or start fresh.
+
+**Managed by `session-continuity.js`:**
+
+```bash
+node .archon/runtime/session-continuity.js start <command> "<description>"
+node .archon/runtime/session-continuity.js update <command> <phase> "<summary>"
+node .archon/runtime/session-continuity.js complete-phase <command> <phase> "<summary>"
+node .archon/runtime/session-continuity.js decision <command> "<what>" "<why>"
+node .archon/runtime/session-continuity.js complete [--clear]
+node .archon/runtime/session-continuity.js read [--brief]
+```
+
+The `/build` command calls these automatically at each phase. `SESSION.md` is gitignored (local session state).
+
+## Structured Handoffs
+
+Inter-agent contracts are validated against JSON Schemas in `.archon/runtime/schemas/`:
+
+| Schema | Handoff |
+|--------|---------|
+| `spec-complete` | spec-writer → security |
+| `security-approval` | security → builder |
+| `implementation-complete` | builder → qa |
+| `qa-approval` | qa → devops |
+
+```bash
+node .archon/runtime/handoff.js validate <schema-name> <json-file>
+node .archon/runtime/handoff.js write <schema-name> <json-file>
+node .archon/runtime/handoff.js read <schema-name>
+node .archon/runtime/handoff.js schemas
+```
 
 ## Team Mode (21 agents)
 

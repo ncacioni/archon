@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qa-approval",
+  "description": "Handoff from qa to devops: QA passed and feature is ready for docs/deploy",
+  "type": "object",
+  "required": ["approved", "reviewed_at", "test_summary"],
+  "properties": {
+    "approved": {
+      "type": "boolean",
+      "description": "Whether QA approves the implementation for release"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "description": "ISO 8601 datetime"
+    },
+    "test_summary": {
+      "type": "object",
+      "required": ["total", "passing", "failing"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "passing": { "type": "integer", "minimum": 0 },
+        "failing": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "coverage_percent": { "type": "number", "minimum": 0, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Issues that block release (must be empty for approved: true)"
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Non-blocking issues for devops to be aware of"
+    },
+    "arch_compliance": {
+      "type": "boolean",
+      "description": "Whether Clean Architecture compliance passed"
+    },
+    "sast_clean": {
+      "type": "boolean",
+      "description": "Whether static analysis found no critical issues"
+    },
+    "spec_drift": {
+      "type": "string",
+      "enum": ["none", "minor", "significant"],
+      "description": "Drift between spec and implementation"
+    },
+    "release_notes_hint": {
+      "type": "string",
+      "description": "One-line hint for devops to use in release notes"
+    }
+  },
+  "additionalProperties": false
+}

@@ -32,5 +32,38 @@
       "Bash(chmod 777*)",
       "Bash(chmod -R 777*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .archon/runtime/session-continuity.js read --brief 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .archon/runtime/session-lock.js check --quiet 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .archon/runtime/hooks/pre-bash.js"
+          }
+        ]
+      }
+    ]
   }
 }
