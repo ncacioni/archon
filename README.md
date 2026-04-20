@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/node-%3E%3D18-green?style=flat-square" alt="Node">
   <img src="https://img.shields.io/badge/agents-9%20solo%20%7C%2021%20team-purple?style=flat-square" alt="Agents">
   <img src="https://img.shields.io/badge/commands-11-orange?style=flat-square" alt="Commands">
-  <img src="https://img.shields.io/badge/tests-160%2B%20passing-brightgreen?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/tests-190%2B%20passing-brightgreen?style=flat-square" alt="Tests">
 </p>
 
 # Archon — Intelligent Orchestrator for Claude Code
@@ -149,13 +149,14 @@ Archon includes a Node.js runtime (ES modules, `js-yaml` as only dependency):
 | `session-continuity.js` | SESSION.md writer for cross-session context persistence |
 | `handoff.js` | Structured inter-agent contracts with JSON Schema validation |
 | `hooks/pre-bash.js` | PreToolUse hook blocking dangerous commands |
+| `trace.js` | Post-execution JSONL traces — token and duration stats per pipeline |
 
 ```bash
 cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-160+ tests across 13 test suites.
+190+ tests across 14 test suites.
 
 ## Core Principles
 
