@@ -64,12 +64,24 @@ Write classification to `.claude/scratchpad/classification.json`:
 }
 ```
 
-4. Report to the user:
+4. Get token estimate for this pipeline:
+   ```
+   node .archon/runtime/token-estimator.js estimate --size <size> --command build
+   ```
+   Include the estimate table in the report to the user.
+
+5. Report to the user:
    - Task size, reasoning, affected areas, phases that will run
+   - Token estimate per phase (from step 4)
    - Current mode and agents that will be used
    - **If score >= 40**: show the score, signals, and what team mode would expand. Let the user decide.
    - **If score < 40**: just show the current mode, no recommendation
    - If the user says "switch to team mode", update `.archon/config.yml` and re-resolve.
+
+6. Write initial session checkpoint:
+   ```
+   node .archon/runtime/session-lock.js write build phase-0
+   ```
 
 ### Pre-phase: Agent Resolution
 
@@ -137,11 +149,22 @@ Implement according to specs and ADD. Write implementation log to `.claude/scrat
 
 ### Phase 6: QA
 
+Before spawning QA, run drift detection:
+```
+node .archon/runtime/drift-detector.js check
+```
+If drift is detected (exit code 1), report the signals to the user and include them in the QA scope. This does NOT block QA — it informs it.
+
 Spawn the **qa** agent. Run tests, code review, architecture compliance check.
 
 **If QA fails → loop back to Phase 5 (max 3 iterations). After 3 failures, escalate to user.**
 
 Write to `.claude/scratchpad/qa-review.md`.
+
+After QA completes:
+```
+node .archon/runtime/session-lock.js complete build phase-6
+```
 
 ### Phase 7: Documentation (M/L/XL)
 
