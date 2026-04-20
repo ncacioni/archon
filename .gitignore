@@ -25,6 +25,7 @@ node_modules/
 .archon/state.json
 .archon/session.json
 .archon/runtime/package-lock.json
+.archon/traces/
 SESSION.md
 
 # Claude Code — local only (not shared)

@@ -345,6 +345,7 @@ function updateGitignore(cwd, local = false) {
       '.archon/memory/',
       '.archon/runtime/package-lock.json',
       '.archon/install-mode.json',
+      '.archon/traces/',
       'SESSION.md',
       '',
       '# Claude Code — local only (not shared)',

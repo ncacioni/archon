@@ -131,6 +131,7 @@ node --test __tests__/*.test.js
 | `session-continuity.js` | SESSION.md writer for cross-session context (start/update/complete) |
 | `handoff.js` | Structured inter-agent contracts with JSON Schema validation |
 | `hooks/pre-bash.js` | PreToolUse hook — blocks dangerous Bash commands (npm publish, DROP TABLE, etc.) |
+| `trace.js` | Post-execution JSONL traces — per-pipeline observability, token and duration stats |
 
 ## Fast-Path Transforms
 
@@ -194,6 +195,18 @@ node .archon/runtime/handoff.js validate <schema-name> <json-file>
 node .archon/runtime/handoff.js write <schema-name> <json-file>
 node .archon/runtime/handoff.js read <schema-name>
 node .archon/runtime/handoff.js schemas
+```
+
+## Pipeline Observability
+
+Each pipeline execution writes JSONL traces to `.archon/traces/` (gitignored, one file per UTC day).
+
+```bash
+node .archon/runtime/trace.js summary [--days N]   # token + duration stats by command
+node .archon/runtime/trace.js tail [--n N]         # last N completed traces
+node .archon/runtime/trace.js record start <command> [args]
+node .archon/runtime/trace.js record phase <traceId> <phase> <agent> <outcome> [tokens] [durationMs]
+node .archon/runtime/trace.js record end <traceId> [outcome]
 ```
 
 ## Team Mode (21 agents)
