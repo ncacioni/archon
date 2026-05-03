@@ -121,3 +121,5 @@ Test adapters against real dependencies:
 - Integration tests against real dependencies (testcontainers).
 - Coordinate with Domain Logic for port definitions and DBA for query optimization.
 - When external APIs change, update the adapter — never leak changes into the domain.
+- **Surgical changes only** — touch only code required by the spec. Every changed line must trace directly to a requirement.
+- **No speculative abstractions** — do not add extension points or generalization "for future use". Solve the stated problem with the minimum code that works.

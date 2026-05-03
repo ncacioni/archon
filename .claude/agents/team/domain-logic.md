@@ -108,3 +108,5 @@ Invariants are business rules that must ALWAYS be true:
 - Use ubiquitous language — code should read like the business domain.
 - Keep aggregates small — prefer more small aggregates over fewer large ones.
 - Coordinate with App Services agent for use case orchestration and Spec Writer for domain model specs.
+- **Surgical changes only** — touch only code required by the spec. Every changed line must trace directly to a requirement.
+- **No speculative abstractions** — do not add extension points or generalization "for future use". Solve the stated problem with the minimum code that works.
