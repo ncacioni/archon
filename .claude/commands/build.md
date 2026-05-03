@@ -16,6 +16,17 @@ $ARGUMENTS
 
 ## Pipeline
 
+### Phase 0: Clarification (M/L/XL only)
+
+Before classifying, assess whether the request is ambiguous. A request is ambiguous if any of these are true:
+- The success criteria are not verifiable ("improve", "refactor", "make it better")
+- The scope is unclear (could mean 1 endpoint or 10)
+- A key constraint is missing (auth? which DB? which service?)
+
+If ambiguous AND the request will likely be M or larger: ask **at most 3 questions**, each targeting the most impactful unknown. State what you'll assume if the user doesn't answer. Then proceed — do not wait for clarification if the user says "just do it" or equivalent.
+
+If unambiguous, or clearly S-sized: skip this step entirely.
+
 ### Phase 0: Classification
 
 Classify the task size and determine which phases to run:

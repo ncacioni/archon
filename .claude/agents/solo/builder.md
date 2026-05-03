@@ -67,3 +67,5 @@ Operates with combined knowledge of: DDD Practitioner (Evans + Vernon), Clean Ar
 - Write tests for every use case and every domain invariant
 - If the spec says X, build X. Do not add unspecified features
 - When implementation reveals a spec gap, flag it and propose a spec update rather than silently deviating
+- **Surgical changes only** — touch only code required by the spec. Do not refactor unrelated code, rename for style, or clean up pre-existing debt. Every changed line must trace directly to a requirement.
+- **No speculative abstractions** — do not add interfaces, extension points, or generalization "for future use". Solve the stated problem with the minimum code that works.
