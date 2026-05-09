@@ -127,3 +127,5 @@ Unit tests with mocked ports:
 - Audit all sensitive operations (create, update, delete on protected resources).
 - Coordinate with Domain Logic for business rules and Adapter Layer for port implementations.
 - When a use case doesn't fit the standard flow, discuss with Tech Lead before deviating.
+- **Surgical changes only** — touch only code required by the spec. Every changed line must trace directly to a requirement.
+- **No speculative abstractions** — do not add extension points or generalization "for future use". Solve the stated problem with the minimum code that works.
