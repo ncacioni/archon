@@ -1,3 +1,9 @@
+## [4.4.1](https://github.com/ncacioni/archon/compare/v4.4.0...v4.4.1) (2026-05-09)
+
+### Bug Fixes
+
+* correct stale module count and test suite count in docs ([2b77f63](https://github.com/ncacioni/archon/commit/2b77f6368b85b83ae3ce08a642080705fb997711))
+
 ## [4.4.0](https://github.com/ncacioni/archon/compare/v4.3.0...v4.4.0) (2026-05-09)
 
 ### Features
