@@ -156,7 +156,7 @@ cd .archon/runtime && npm install
 node --test __tests__/*.test.js
 ```
 
-190+ tests across 14 test suites.
+190+ tests across 15 test suites.
 
 ## Core Principles
 
@@ -196,7 +196,7 @@ The devops agent includes semantic-release patterns in its `devops-patterns` ski
 docs/                Framework documentation
 bin/                 CLI (npx github:ncacioni/archon init)
 .archon/
-  runtime/           6 modules + test suite
+  runtime/           15 modules + hooks/ + schemas/ + test suite
   toolkits/          Agent toolkit indices + tool definitions (YAML)
   config.yml         Project configuration
 ```
