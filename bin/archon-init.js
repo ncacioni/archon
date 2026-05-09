@@ -195,7 +195,7 @@ function main(local = false) {
   // 9. Copy .claude commands
   if (fs.existsSync(SRC_COMMANDS)) {
     copyDir(SRC_COMMANDS, path.join(CLAUDE_DIR, 'commands'));
-    console.log('  Copied: commands (10)');
+    console.log('  Copied: commands (11)');
   }
 
   // 10. Copy settings.json
