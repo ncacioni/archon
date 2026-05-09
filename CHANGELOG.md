@@ -1,3 +1,10 @@
+## [4.4.0](https://github.com/ncacioni/archon/compare/v4.3.0...v4.4.0) (2026-05-09)
+
+### Features
+
+* apply Karpathy surgical-clarity principles to builder agents ([0f3a0c5](https://github.com/ncacioni/archon/commit/0f3a0c56fe886ce9f4b08615960bc802dcbb60b3))
+* apply Karpathy surgical-clarity principles to builder agents ([3a51796](https://github.com/ncacioni/archon/commit/3a51796bdefc260fb44a4a9935eb55fe2210e2a5))
+
 ## [4.3.0](https://github.com/ncacioni/archon/compare/v4.2.0...v4.3.0) (2026-04-20)
 
 ### Features
